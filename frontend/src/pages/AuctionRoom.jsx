@@ -5,6 +5,8 @@ import { Input } from "../components/ui/input";
 import { Badge } from "../components/ui/badge";
 import { useParams, useNavigate } from "react-router-dom";
 import { cricketPlayers } from "../data/cricketPlayers";
+import useWebSocket from "../hooks/useWebSocket";
+import AchievementNotification from "../components/AchievementNotification";
 import { 
   Clock, 
   Gavel, 
@@ -17,7 +19,9 @@ import {
   Timer,
   Trophy,
   Target,
-  ArrowLeft
+  ArrowLeft,
+  Wifi,
+  WifiOff
 } from "lucide-react";
 
 const AuctionRoom = () => {
@@ -29,12 +33,28 @@ const AuctionRoom = () => {
   
   // Auction state
   const [currentBid, setCurrentBid] = useState(player?.price || 500000);
-  const [timeLeft, setTimeLeft] = useState(180); // 3 minutes
-  const [isActive, setIsActive] = useState(true);
   const [bidAmount, setBidAmount] = useState("");
+  const [achievement, setAchievement] = useState(null);
   
-  // Participants and bids
-  const [participants] = useState([
+  // Mock user data (in production, get from auth context)
+  const currentUser = {
+    id: "user-123",
+    username: "You"
+  };
+
+  // WebSocket connection
+  const {
+    isConnected,
+    participants,
+    bidHistory,
+    timeRemaining,
+    auctionStatus,
+    joinAuction,
+    leaveAuction
+  } = useWebSocket(currentUser.id);
+
+  // Participants and bids (enhanced with WebSocket data)
+  const [localParticipants] = useState([
     {
       id: "1",
       username: "CricketKing",
@@ -78,7 +98,7 @@ const AuctionRoom = () => {
     }
   ]);
 
-  const [bidHistory, setBidHistory] = useState([
+  const [localBidHistory, setLocalBidHistory] = useState([
     {
       id: "1",
       userId: "1",
@@ -97,31 +117,35 @@ const AuctionRoom = () => {
     }
   ]);
 
-  // Timer countdown
-  useEffect(() => {
-    if (!isActive || timeLeft <= 0) return;
-    
-    const timer = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev <= 1) {
-          setIsActive(false);
-          alert("Auction ended! 🏆");
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+  // Use WebSocket bid history if available, otherwise fallback to local
+  const displayBidHistory = bidHistory.length > 0 ? bidHistory : localBidHistory;
+  const displayParticipants = participants.length > 0 ? 
+    localParticipants.map(p => ({
+      ...p,
+      isOnline: participants.some(wp => wp.username === p.username) || p.username === "You"
+    })) : 
+    localParticipants;
 
-    return () => clearInterval(timer);
-  }, [isActive, timeLeft]);
-
-  // Simulate random bids from other participants
+  // Join auction when component mounts
   useEffect(() => {
-    if (!isActive) return;
+    if (player && isConnected) {
+      joinAuction(`auction-${playerId}`, currentUser.username);
+    }
+
+    return () => {
+      if (isConnected) {
+        leaveAuction(currentUser.username);
+      }
+    };
+  }, [player, isConnected, joinAuction, leaveAuction, playerId, currentUser.username]);
+
+  // Simulate random bids from other participants (enhanced with WebSocket)
+  useEffect(() => {
+    if (auctionStatus !== 'active') return;
 
     const bidInterval = setInterval(() => {
-      if (Math.random() > 0.7) { // 30% chance every 3 seconds
-        const randomParticipant = participants[Math.floor(Math.random() * (participants.length - 1))];
+      if (Math.random() > 0.8) { // 20% chance every 3 seconds
+        const randomParticipant = localParticipants[Math.floor(Math.random() * (localParticipants.length - 1))];
         if (randomParticipant.id !== "2" && randomParticipant.isOnline) {
           const newBidAmount = currentBid + (Math.floor(Math.random() * 3) + 1) * 25000;
           
@@ -133,7 +157,7 @@ const AuctionRoom = () => {
     }, 3000);
 
     return () => clearInterval(bidInterval);
-  }, [isActive, currentBid, participants]);
+  }, [auctionStatus, currentBid, localParticipants]);
 
   const simulateBid = (participant, amount) => {
     const newBid = {
@@ -145,21 +169,18 @@ const AuctionRoom = () => {
       isWinning: true
     };
 
-    setBidHistory(prev => {
+    setLocalBidHistory(prev => {
       const updated = prev.map(bid => ({ ...bid, isWinning: false }));
       return [newBid, ...updated].slice(0, 10);
     });
 
     setCurrentBid(amount);
-    setTimeLeft(Math.min(timeLeft + 30, 180)); // Add 30 seconds, max 3 minutes
-    
-    alert(`${participant.username} bid $${amount.toLocaleString()}! 🎯`);
   };
 
-  const placeBid = useCallback(() => {
+  const placeBid = useCallback(async () => {
     const amount = parseInt(bidAmount);
     const minBid = currentBid + 25000;
-    const myBudget = participants.find(p => p.id === "2")?.remainingBudget || 0;
+    const myBudget = localParticipants.find(p => p.id === "2")?.remainingBudget || 0;
 
     if (!amount || amount < minBid) {
       alert(`Minimum bid is $${minBid.toLocaleString()}`);
@@ -171,30 +192,48 @@ const AuctionRoom = () => {
       return;
     }
 
-    const newBid = {
-      id: Date.now().toString(),
-      userId: "2",
-      username: "You",
-      amount,
-      timestamp: new Date(),
-      isWinning: true
-    };
+    try {
+      // In a real implementation, this would call the API
+      // const response = await auctionsApi.placeBid(auctionId, { amount });
+      
+      const newBid = {
+        id: Date.now().toString(),
+        userId: "2",
+        username: "You",
+        amount,
+        timestamp: new Date(),
+        isWinning: true
+      };
 
-    setBidHistory(prev => {
-      const updated = prev.map(bid => ({ ...bid, isWinning: false }));
-      return [newBid, ...updated].slice(0, 10);
-    });
+      setLocalBidHistory(prev => {
+        const updated = prev.map(bid => ({ ...bid, isWinning: false }));
+        return [newBid, ...updated].slice(0, 10);
+      });
 
-    setCurrentBid(amount);
-    setTimeLeft(Math.min(timeLeft + 30, 180));
-    setBidAmount("");
-    
-    alert(`Bid placed: $${amount.toLocaleString()}! 🚀`);
-  }, [bidAmount, currentBid, timeLeft, participants]);
+      setCurrentBid(amount);
+      setBidAmount("");
+      
+      // Show achievement notification for first bid
+      if (localBidHistory.length === 0 || !localBidHistory.some(bid => bid.userId === "2")) {
+        setAchievement({
+          id: 'first_bid',
+          title: 'First Bid',
+          description: 'You placed your first bid!',
+          icon: '🎯',
+          points: 10,
+          category: 'beginner'
+        });
+      }
+      
+    } catch (error) {
+      console.error('Error placing bid:', error);
+      alert('Error placing bid. Please try again.');
+    }
+  }, [bidAmount, currentBid, localParticipants, localBidHistory]);
 
   const quickBid = (increment) => {
     const amount = currentBid + increment;
-    const myBudget = participants.find(p => p.id === "2")?.remainingBudget || 0;
+    const myBudget = localParticipants.find(p => p.id === "2")?.remainingBudget || 0;
     
     if (amount > myBudget) {
       alert("Insufficient budget!");
@@ -222,12 +261,21 @@ const AuctionRoom = () => {
     );
   }
 
-  const currentWinner = bidHistory[0];
-  const myBudget = participants.find(p => p.id === "2")?.remainingBudget || 0;
+  const currentWinner = displayBidHistory[0];
+  const myBudget = localParticipants.find(p => p.id === "2")?.remainingBudget || 0;
   const amIWinning = currentWinner?.userId === "2";
+  const isActive = auctionStatus === 'active';
 
   return (
     <div className="min-h-screen pb-20 md:pt-20 bg-gradient-to-br from-background via-background to-muted/20">
+      {/* Achievement Notification */}
+      {achievement && (
+        <AchievementNotification
+          achievement={achievement}
+          onClose={() => setAchievement(null)}
+        />
+      )}
+
       <div className="container mx-auto px-4 py-6">
         {/* Header */}
         <div className="flex items-center gap-4 mb-6">
@@ -243,6 +291,19 @@ const AuctionRoom = () => {
           <Badge variant={isActive ? "destructive" : "secondary"} className="animate-pulse">
             {isActive ? "LIVE AUCTION" : "ENDED"}
           </Badge>
+          <div className="flex items-center gap-2">
+            {isConnected ? (
+              <div className="flex items-center gap-1 text-success">
+                <Wifi className="h-4 w-4" />
+                <span className="text-sm">Connected</span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-1 text-warning">
+                <WifiOff className="h-4 w-4" />
+                <span className="text-sm">Connecting...</span>
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -302,13 +363,13 @@ const AuctionRoom = () => {
                     <Timer className="h-5 w-5 text-warning" />
                     <span className="text-sm text-muted-foreground">Time Remaining</span>
                   </div>
-                  <div className={`text-4xl md:text-5xl font-bold mb-2 ${timeLeft <= 30 ? 'text-destructive animate-pulse' : 'text-warning'}`}>
-                    {formatTime(timeLeft)}
+                  <div className={`text-4xl md:text-5xl font-bold mb-2 ${timeRemaining <= 30 ? 'text-destructive animate-pulse' : 'text-warning'}`}>
+                    {formatTime(timeRemaining)}
                   </div>
                   <div className="w-full bg-muted rounded-full h-2">
                     <div 
                       className="bg-warning h-2 rounded-full transition-all duration-1000"
-                      style={{ width: `${(timeLeft / 180) * 100}%` }}
+                      style={{ width: `${(timeRemaining / 180) * 100}%` }}
                     />
                   </div>
                 </div>
@@ -377,7 +438,7 @@ const AuctionRoom = () => {
                   </div>
 
                   <div className="text-xs text-muted-foreground text-center">
-                    Minimum bid increment: $25,000
+                    Minimum bid increment: $25,000 • {isConnected ? 'Real-time' : 'Offline'} mode
                   </div>
                 </div>
               </Card>
@@ -407,10 +468,10 @@ const AuctionRoom = () => {
             <Card className="p-4">
               <h3 className="font-semibold mb-4 flex items-center gap-2">
                 <Users className="h-4 w-4" />
-                Participants ({participants.filter(p => p.isOnline).length} online)
+                Participants ({displayParticipants.filter(p => p.isOnline).length} online)
               </h3>
               <div className="space-y-3">
-                {participants.map((participant) => (
+                {displayParticipants.map((participant) => (
                   <div key={participant.id} className="flex items-center gap-3 p-2 rounded-lg bg-muted/20">
                     <div className="relative">
                       <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-xs font-bold">
@@ -446,7 +507,7 @@ const AuctionRoom = () => {
                 Bid History
               </h3>
               <div className="space-y-2 max-h-64 overflow-y-auto">
-                {bidHistory.map((bid, index) => (
+                {displayBidHistory.map((bid, index) => (
                   <div 
                     key={bid.id} 
                     className={`p-3 rounded-lg ${bid.isWinning ? 'bg-success/10 border border-success/20' : 'bg-muted/20'} ${index === 0 ? 'animate-fade-in' : ''}`}
@@ -481,7 +542,7 @@ const AuctionRoom = () => {
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span className="text-sm text-muted-foreground">Total Bids</span>
-                  <span className="font-medium">{bidHistory.length}</span>
+                  <span className="font-medium">{displayBidHistory.length}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-muted-foreground">Starting Price</span>
@@ -494,8 +555,10 @@ const AuctionRoom = () => {
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Avg Bid Increment</span>
-                  <span className="font-medium">$37.5K</span>
+                  <span className="text-sm text-muted-foreground">WebSocket Status</span>
+                  <Badge variant={isConnected ? "success" : "warning"}>
+                    {isConnected ? "Connected" : "Connecting"}
+                  </Badge>
                 </div>
               </div>
             </Card>
