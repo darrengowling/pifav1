@@ -1,81 +1,64 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Card } from './ui/card';
 import { Badge } from './ui/badge';
 import { Users, Trophy, Timer, Target } from 'lucide-react';
-import { playersApi } from '../lib/api';
+import { useLiveStats } from '../hooks/useApi';
+import { StatsCardSkeleton } from './LoadingSpinner';
 
 const RealTimeStats = () => {
-  const [stats, setStats] = useState({
-    totalUsers: 0,
-    onlineUsers: 0,
-    activeAuctions: 0,
-    totalTournaments: 0,
-    websocketConnections: 0
-  });
-
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/stats/live`);
-        if (response.ok) {
-          const data = await response.json();
-          setStats(data);
-        }
-      } catch (error) {
-        console.error('Error fetching live stats:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchStats();
-    
-    // Update stats every 5 seconds
-    const interval = setInterval(fetchStats, 5000);
-    
-    return () => clearInterval(interval);
-  }, []);
+  const { data: stats, isLoading, error } = useLiveStats();
 
   const statItems = [
     {
       icon: Users,
       label: 'Online Users',
-      value: stats.onlineUsers,
-      total: stats.totalUsers,
+      value: stats?.onlineUsers || 0,
+      total: stats?.totalUsers || 0,
       color: 'text-success',
       showRatio: true
     },
     {
       icon: Trophy,
       label: 'Live Auctions',
-      value: stats.activeAuctions,
+      value: stats?.activeAuctions || 0,
       color: 'text-warning',
-      pulse: stats.activeAuctions > 0
+      pulse: (stats?.activeAuctions || 0) > 0
     },
     {
       icon: Target,
       label: 'Tournaments',
-      value: stats.totalTournaments,
+      value: stats?.totalTournaments || 0,
       color: 'text-primary'
     },
     {
       icon: Timer,
-      label: 'Real-time Connections',
-      value: stats.websocketConnections,
-      color: 'text-secondary'
+      label: 'WebSocket Connections',
+      value: stats?.websocketConnections || 0,
+      color: 'text-secondary',
+      pulse: (stats?.websocketConnections || 0) > 0
     }
   ];
+
+  if (error) {
+    return (
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        {[1, 2, 3, 4].map((i) => (
+          <Card key={i} className="p-4 text-center">
+            <div className="text-muted-foreground">
+              <div className="text-2xl font-bold">--</div>
+              <div className="text-sm">Offline</div>
+            </div>
+          </Card>
+        ))}
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         {[1, 2, 3, 4].map((i) => (
-          <Card key={i} className="p-4 animate-pulse">
-            <div className="h-4 bg-muted rounded mb-2"></div>
-            <div className="h-6 bg-muted rounded"></div>
-          </Card>
+          <StatsCardSkeleton key={i} />
         ))}
       </div>
     );
@@ -84,15 +67,28 @@ const RealTimeStats = () => {
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
       {statItems.map((item, index) => (
-        <Card key={index} className="p-4 text-center gradient-auction">
+        <Card key={index} className="p-4 text-center gradient-auction transition-all hover:scale-105">
           <div className={`flex items-center justify-center mb-2 ${item.pulse ? 'animate-pulse-glow' : ''}`}>
             <item.icon className={`h-5 w-5 ${item.color}`} />
           </div>
-          <div className={`text-2xl font-bold ${item.color} mb-1`}>
+          <div className={`text-2xl font-bold ${item.color} mb-1 flex items-center justify-center gap-2`}>
             {item.showRatio ? `${item.value}/${item.total}` : item.value}
-            {item.pulse && <Badge variant="destructive" className="ml-2 text-xs animate-pulse">LIVE</Badge>}
+            {item.pulse && item.value > 0 && (
+              <Badge variant="destructive" className="text-xs animate-pulse">
+                LIVE
+              </Badge>
+            )}
           </div>
           <div className="text-sm text-muted-foreground">{item.label}</div>
+          
+          {/* Connection quality indicator */}
+          {item.label === 'WebSocket Connections' && (
+            <div className="mt-2">
+              <div className={`text-xs ${item.value > 0 ? 'text-success' : 'text-muted-foreground'}`}>
+                {item.value > 0 ? '🟢 Connected' : '⚪ Offline'}
+              </div>
+            </div>
+          )}
         </Card>
       ))}
     </div>
