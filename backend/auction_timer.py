@@ -2,7 +2,7 @@ import asyncio
 import logging
 from datetime import datetime, timedelta
 from typing import Dict, Optional
-from .websocket_manager import manager
+from websocket_manager import manager
 
 logger = logging.getLogger(__name__)
 
