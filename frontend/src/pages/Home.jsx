@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "../components/ui/button";
 import { sports } from "../data/sports";
+import RealTimeStats from "../components/RealTimeStats";
 import { TrendingUp, Trophy, Users, Zap } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -50,7 +51,7 @@ const Home = () => {
               Play with friends. Bid for superstars. Build legendary teams.
             </p>
             <div className="inline-block bg-success/20 text-success px-4 py-2 rounded-full text-sm font-medium mb-8">
-              No gambling. All game.
+              🔴 Live Real-time Auctions • WebSocket Powered
             </div>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
@@ -81,6 +82,20 @@ const Home = () => {
         </div>
       </section>
 
+      {/* Real-time Stats Section */}
+      <section className="py-8 border-y border-border bg-card/50 backdrop-blur-sm">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-6">
+            <h2 className="text-2xl font-bold mb-2 flex items-center justify-center gap-2">
+              <TrendingUp className="h-6 w-6 text-primary" />
+              Live Platform Stats
+            </h2>
+            <p className="text-muted-foreground">Real-time data powered by WebSocket connections</p>
+          </div>
+          <RealTimeStats />
+        </div>
+      </section>
+
       {/* Features Section */}
       <section className="py-16 relative" style={{
         backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.6)), url("https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80")',
@@ -99,42 +114,64 @@ const Home = () => {
           <div className="grid grid-cols-1 gap-6 max-w-sm mx-auto md:grid-cols-3 md:gap-8 md:max-w-4xl">
             <div className="text-center p-8 rounded-lg border border-border bg-card/80 backdrop-blur-sm">
               <div className="text-warning text-3xl mb-4">⚡</div>
-              <h3 className="font-semibold mb-2 text-lg">Live Auctions</h3>
-              <p className="text-muted-foreground">Real-time bidding with timer-based competitions</p>
+              <h3 className="font-semibold mb-2 text-lg">Real-time Bidding</h3>
+              <p className="text-muted-foreground">WebSocket-powered live auctions with instant updates</p>
             </div>
             <div className="text-center p-8 rounded-lg border border-border bg-card/80 backdrop-blur-sm">
               <div className="text-success text-3xl mb-4">🏆</div>
-              <h3 className="font-semibold mb-2 text-lg">Tournament Admin</h3>
-              <p className="text-muted-foreground">Create custom tournaments and invite friends</p>
+              <h3 className="font-semibold mb-2 text-lg">Achievement System</h3>
+              <p className="text-muted-foreground">Unlock achievements and earn points for your cricket expertise</p>
             </div>
             <div className="text-center p-8 rounded-lg border border-border bg-card/80 backdrop-blur-sm">
-              <div className="text-primary text-3xl mb-4">📈</div>
-              <h3 className="font-semibold mb-2 text-lg">Live Scoring</h3>
-              <p className="text-muted-foreground">Track real cricket performance instantly</p>
+              <div className="text-primary text-3xl mb-4">👥</div>
+              <h3 className="font-semibold mb-2 text-lg">Social Features</h3>
+              <p className="text-muted-foreground">Invite friends, chat during auctions, and build communities</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Live Stats */}
-      <section className="py-8 border-y border-border">
+      {/* Technology Showcase */}
+      <section className="py-16 bg-gradient-to-r from-primary/5 to-secondary/5">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div className="text-center">
-              <div className="text-2xl md:text-3xl font-bold text-success">47</div>
-              <div className="text-sm text-muted-foreground">Live Auctions</div>
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Advanced Features</h2>
+            <p className="text-lg text-muted-foreground">
+              Built with cutting-edge technology for the ultimate auction experience
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="text-center p-6 rounded-lg bg-card border border-border">
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                <Zap className="h-6 w-6 text-primary" />
+              </div>
+              <h3 className="font-semibold mb-2">WebSocket Technology</h3>
+              <p className="text-sm text-muted-foreground">Real-time bidding updates across all devices</p>
             </div>
-            <div className="text-center">
-              <div className="text-2xl md:text-3xl font-bold text-warning">1.2K</div>
-              <div className="text-sm text-muted-foreground">Active Users</div>
+            
+            <div className="text-center p-6 rounded-lg bg-card border border-border">
+              <div className="w-12 h-12 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-4">
+                <Trophy className="h-6 w-6 text-success" />
+              </div>
+              <h3 className="font-semibold mb-2">Smart Timers</h3>
+              <p className="text-sm text-muted-foreground">Auto-extending timers with final countdown alerts</p>
             </div>
-            <div className="text-center">
-              <div className="text-2xl md:text-3xl font-bold text-secondary">156</div>
-              <div className="text-sm text-muted-foreground">Active Tournaments</div>
+            
+            <div className="text-center p-6 rounded-lg bg-card border border-border">
+              <div className="w-12 h-12 rounded-full bg-warning/10 flex items-center justify-center mx-auto mb-4">
+                <Users className="h-6 w-6 text-warning" />
+              </div>
+              <h3 className="font-semibold mb-2">Live Presence</h3>
+              <p className="text-sm text-muted-foreground">See who's online and participating in auctions</p>
             </div>
-            <div className="text-center">
-              <div className="text-2xl md:text-3xl font-bold text-primary">$2.4M</div>
-              <div className="text-sm text-muted-foreground">Total Prize Pool</div>
+            
+            <div className="text-center p-6 rounded-lg bg-card border border-border">
+              <div className="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center mx-auto mb-4">
+                <TrendingUp className="h-6 w-6 text-secondary" />
+              </div>
+              <h3 className="font-semibold mb-2">Live Analytics</h3>
+              <p className="text-sm text-muted-foreground">Real-time statistics and performance tracking</p>
             </div>
           </div>
         </div>
@@ -146,7 +183,7 @@ const Home = () => {
           <div className="text-center max-w-2xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Build Your Squad?</h2>
             <p className="text-lg text-muted-foreground mb-8">
-              Strategy meets cricket. Knowledge beats luck. Champions are made here.
+              Join the most advanced cricket auction platform with real-time features and social gameplay.
             </p>
             <div className="flex justify-center">
               <Button 
@@ -159,7 +196,7 @@ const Home = () => {
                 }}
               >
                 <Trophy className="mr-2 h-5 w-5" />
-                Go to Tournaments
+                Start Your Journey
               </Button>
             </div>
           </div>
