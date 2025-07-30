@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import toast, { Toaster } from 'react-hot-toast';
 import Navigation from "./components/Navigation";
@@ -11,25 +11,22 @@ import HowItWorks from "./pages/HowItWorks";
 import NotFound from "./pages/NotFound";
 import "./App.css";
 
-const queryClient = new QueryClient();
-
-// Debug component to show current route
-function RouteDebugger() {
-  const location = useLocation();
-  console.log('Current route:', location.pathname);
-  return (
-    <div className="fixed top-2 right-2 bg-red-500 text-white px-2 py-1 text-xs z-50">
-      Route: {location.pathname}
-    </div>
-  );
-}
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 2,
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      cacheTime: 10 * 60 * 1000, // 10 minutes
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
         <div className="App">
-          <RouteDebugger />
           <Navigation />
           <Routes>
             <Route path="/" element={<Home />} />
@@ -47,6 +44,18 @@ function App() {
                 background: 'hsl(var(--card))',
                 color: 'hsl(var(--card-foreground))',
                 border: '1px solid hsl(var(--border))',
+              },
+              success: {
+                iconTheme: {
+                  primary: 'hsl(var(--success))',
+                  secondary: 'hsl(var(--success-foreground))',
+                },
+              },
+              error: {
+                iconTheme: {
+                  primary: 'hsl(var(--destructive))',
+                  secondary: 'hsl(var(--destructive-foreground))',
+                },
               },
             }}
           />
