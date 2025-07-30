@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import toast, { Toaster } from 'react-hot-toast';
 import Navigation from "./components/Navigation";
@@ -13,11 +13,23 @@ import "./App.css";
 
 const queryClient = new QueryClient();
 
+// Debug component to show current route
+function RouteDebugger() {
+  const location = useLocation();
+  console.log('Current route:', location.pathname);
+  return (
+    <div className="fixed top-2 right-2 bg-red-500 text-white px-2 py-1 text-xs z-50">
+      Route: {location.pathname}
+    </div>
+  );
+}
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
         <div className="App">
+          <RouteDebugger />
           <Navigation />
           <Routes>
             <Route path="/" element={<Home />} />
