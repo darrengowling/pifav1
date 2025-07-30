@@ -355,7 +355,7 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
     except WebSocketDisconnect:
         manager.disconnect(user_id)
 
-# Initialize database with cricket players
+# Initialize database with cricket players and create indexes for performance
 async def init_db():
     # Check if players collection is empty
     player_count = await db.players.count_documents({})
@@ -365,6 +365,48 @@ async def init_db():
         player_dicts = [player.dict() for player in players]
         await db.players.insert_many(player_dicts)
         logger.info(f"Inserted {len(players)} cricket players into database")
+
+    # Create database indexes for performance
+    try:
+        # Users collection indexes
+        await db.users.create_index([("email", 1)], unique=True)
+        await db.users.create_index([("username", 1)])
+        await db.users.create_index([("is_online", 1)])
+        await db.users.create_index([("created_at", -1)])
+
+        # Players collection indexes
+        await db.players.create_index([("name", 1)])
+        await db.players.create_index([("position", 1)])
+        await db.players.create_index([("rating", -1)])
+        await db.players.create_index([("price", 1)])
+        await db.players.create_index([("sport", 1)])
+        
+        # Tournaments collection indexes
+        await db.tournaments.create_index([("admin_id", 1)])
+        await db.tournaments.create_index([("status", 1)])
+        await db.tournaments.create_index([("created_at", -1)])
+        await db.tournaments.create_index([("invite_code", 1)], unique=True, sparse=True)
+        await db.tournaments.create_index([("name", "text"), ("real_life_tournament", "text")])
+        
+        # Auctions collection indexes
+        await db.auctions.create_index([("tournament_id", 1)])
+        await db.auctions.create_index([("player_id", 1)])
+        await db.auctions.create_index([("is_active", 1)])
+        await db.auctions.create_index([("highest_bidder_id", 1)])
+        await db.auctions.create_index([("end_time", 1)])
+        await db.auctions.create_index([("start_time", -1)])
+        
+        # Bids collection indexes
+        await db.bids.create_index([("auction_id", 1)])
+        await db.bids.create_index([("user_id", 1)])
+        await db.bids.create_index([("timestamp", -1)])
+        await db.bids.create_index([("is_winning", 1)])
+        await db.bids.create_index([("amount", -1)])
+        
+        logger.info("Database indexes created successfully for optimal performance")
+        
+    except Exception as e:
+        logger.error(f"Error creating database indexes: {e}")
 
 # Routes (keeping existing ones and adding new ones)
 @api_router.get("/")
