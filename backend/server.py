@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, HTTPException, Depends
+from fastapi import FastAPI, APIRouter, HTTPException, Depends, WebSocket, WebSocketDisconnect
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
@@ -13,6 +13,12 @@ from datetime import datetime, timedelta
 import bcrypt
 import jwt
 from enum import Enum
+import asyncio
+
+# Import our custom modules
+from websocket_manager import manager
+from auction_timer import auction_timer
+from achievements import achievement_manager, Achievement
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -52,7 +58,7 @@ class InviteStatus(str, Enum):
     ACCEPTED = "accepted"
     DECLINED = "declined"
 
-# Models
+# Enhanced Models with achievements and social features
 class User(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     username: str
@@ -63,6 +69,10 @@ class User(BaseModel):
     credits: int = 0
     leagues_won: int = 0
     total_spent: int = 0
+    achievements: List[dict] = []
+    total_points: int = 0
+    is_online: bool = False
+    last_seen: Optional[datetime] = None
 
 class UserCreate(BaseModel):
     username: str
@@ -82,6 +92,9 @@ class UserResponse(BaseModel):
     leagues_won: int
     total_spent: int
     created_at: datetime
+    achievements: List[dict] = []
+    total_points: int = 0
+    is_online: bool = False
 
 class Player(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
@@ -118,6 +131,7 @@ class TournamentParticipant(BaseModel):
     total_score: int = 0
     is_admin: bool = False
     invite_status: InviteStatus = InviteStatus.PENDING
+    is_online: bool = False
 
 class Tournament(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
@@ -159,6 +173,8 @@ class Auction(BaseModel):
     end_time: Optional[datetime] = None
     is_active: bool = True
     min_increment: int = 25000
+    winner_id: Optional[str] = None
+    final_price: Optional[int] = None
 
 class AuctionCreate(BaseModel):
     tournament_id: str
@@ -177,7 +193,18 @@ class Bid(BaseModel):
 class BidCreate(BaseModel):
     amount: int
 
-# Default cricket players data
+class NotificationCreate(BaseModel):
+    title: str
+    message: str
+    type: str = "info"  # info, success, warning, error
+
+class AuctionMessage(BaseModel):
+    user_id: str
+    username: str
+    message: str
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
+
+# Default cricket players data (same as before)
 CRICKET_PLAYERS = [
     {
         "id": "1", "name": "Virat Kohli", "position": "Batsman", "rating": 95, "price": 850000,
@@ -261,7 +288,7 @@ CRICKET_PLAYERS = [
     }
 ]
 
-# Utility functions
+# Utility functions (same as before)
 def hash_password(password: str) -> str:
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
@@ -289,6 +316,12 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         if user is None:
             raise HTTPException(status_code=401, detail="User not found")
         
+        # Update last seen and online status
+        await db.users.update_one(
+            {"id": user_id},
+            {"$set": {"last_seen": datetime.utcnow(), "is_online": True}}
+        )
+        
         return User(**user)
     except jwt.PyJWTError:
         raise HTTPException(status_code=401, detail="Invalid authentication credentials")
@@ -297,6 +330,30 @@ def generate_invite_code() -> str:
     import random
     import string
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+
+# WebSocket endpoint for real-time features
+@app.websocket("/ws/{user_id}")
+async def websocket_endpoint(websocket: WebSocket, user_id: str):
+    await manager.connect(websocket, user_id)
+    try:
+        while True:
+            data = await websocket.receive_text()
+            message = eval(data)  # In production, use json.loads with proper validation
+            
+            if message.get("type") == "join_auction":
+                auction_id = message.get("auction_id")
+                username = message.get("username", "Anonymous")
+                await manager.join_auction(user_id, auction_id, username)
+                
+            elif message.get("type") == "leave_auction":
+                username = message.get("username", "Anonymous")
+                await manager.leave_auction(user_id, username)
+                
+            elif message.get("type") == "ping":
+                await manager.send_personal_message({"type": "pong"}, user_id)
+                
+    except WebSocketDisconnect:
+        manager.disconnect(user_id)
 
 # Initialize database with cricket players
 async def init_db():
@@ -309,12 +366,17 @@ async def init_db():
         await db.players.insert_many(player_dicts)
         logger.info(f"Inserted {len(players)} cricket players into database")
 
-# Routes
+# Routes (keeping existing ones and adding new ones)
 @api_router.get("/")
 async def root():
-    return {"message": "SportX Cricket Auction API", "version": "1.0.0"}
+    return {
+        "message": "SportX Cricket Auction API", 
+        "version": "1.0.0",
+        "features": ["Real-time bidding", "WebSocket support", "Achievements", "Social features"],
+        "online_users": manager.get_online_users_count()
+    }
 
-# Authentication routes
+# Enhanced Authentication routes
 @api_router.post("/auth/register", response_model=UserResponse)
 async def register(user_data: UserCreate):
     # Check if user already exists
@@ -327,10 +389,15 @@ async def register(user_data: UserCreate):
     user = User(
         username=user_data.username,
         email=user_data.email,
-        password_hash=hashed_password
+        password_hash=hashed_password,
+        is_online=True
     )
     
     await db.users.insert_one(user.dict())
+    
+    # Check for first-time achievements
+    await achievement_manager.check_achievements(user.id, "register", {}, db)
+    
     return UserResponse(**user.dict())
 
 @api_router.post("/auth/login")
@@ -339,6 +406,12 @@ async def login(user_data: UserLogin):
     if not user or not verify_password(user_data.password, user["password_hash"]):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
+    # Update online status
+    await db.users.update_one(
+        {"id": user["id"]},
+        {"$set": {"is_online": True, "last_seen": datetime.utcnow()}}
+    )
+    
     access_token = create_access_token(data={"sub": user["id"]})
     return {"access_token": access_token, "token_type": "bearer", "user": UserResponse(**user)}
 
@@ -346,7 +419,16 @@ async def login(user_data: UserLogin):
 async def get_profile(current_user: User = Depends(get_current_user)):
     return UserResponse(**current_user.dict())
 
-# Player routes
+@api_router.post("/auth/logout")
+async def logout(current_user: User = Depends(get_current_user)):
+    # Update offline status
+    await db.users.update_one(
+        {"id": current_user.id},
+        {"$set": {"is_online": False, "last_seen": datetime.utcnow()}}
+    )
+    return {"message": "Logged out successfully"}
+
+# Player routes (same as before)
 @api_router.get("/players", response_model=List[Player])
 async def get_players(position: Optional[str] = None, search: Optional[str] = None):
     query = {}
@@ -374,7 +456,7 @@ async def create_player(player_data: PlayerCreate, current_user: User = Depends(
     await db.players.insert_one(player.dict())
     return player
 
-# Tournament routes
+# Enhanced Tournament routes
 @api_router.get("/tournaments", response_model=List[Tournament])
 async def get_tournaments(status: Optional[str] = None, search: Optional[str] = None):
     query = {}
@@ -411,12 +493,17 @@ async def create_tournament(tournament_data: TournamentCreate, current_user: Use
         budget=tournament.budget,
         current_budget=tournament.budget,
         is_admin=True,
-        invite_status=InviteStatus.ACCEPTED
+        invite_status=InviteStatus.ACCEPTED,
+        is_online=current_user.is_online
     )
     tournament.participants.append(admin_participant)
     tournament.status = TournamentStatus.SETUP
     
     await db.tournaments.insert_one(tournament.dict())
+    
+    # Check achievements
+    await achievement_manager.check_achievements(current_user.id, "create_tournament", {}, db)
+    
     return tournament
 
 @api_router.post("/tournaments/{tournament_id}/join", response_model=Tournament)
@@ -446,7 +533,8 @@ async def join_tournament(tournament_id: str, join_data: TournamentJoin, current
         username=current_user.username,
         budget=tournament_obj.budget,
         current_budget=tournament_obj.budget,
-        invite_status=InviteStatus.ACCEPTED
+        invite_status=InviteStatus.ACCEPTED,
+        is_online=current_user.is_online
     )
     tournament_obj.participants.append(participant)
     
@@ -457,7 +545,7 @@ async def join_tournament(tournament_id: str, join_data: TournamentJoin, current
     
     return tournament_obj
 
-# Auction routes
+# Enhanced Auction routes with real-time features
 @api_router.get("/auctions", response_model=List[Auction])
 async def get_auctions(tournament_id: Optional[str] = None, is_active: Optional[bool] = None):
     query = {}
@@ -500,6 +588,10 @@ async def create_auction(auction_data: AuctionCreate, current_user: User = Depen
     )
     
     await db.auctions.insert_one(auction.dict())
+    
+    # Start auction timer
+    await auction_timer.start_auction_timer(auction.id, auction_data.duration_minutes * 60, db)
+    
     return auction
 
 @api_router.post("/auctions/{auction_id}/bid", response_model=Bid)
@@ -550,12 +642,55 @@ async def place_bid(auction_id: str, bid_data: BidCreate, current_user: User = D
         }}
     )
     
+    # Extend timer if bid placed in final 30 seconds
+    time_remaining = auction_timer.get_time_remaining(auction_id)
+    if time_remaining and time_remaining <= 30:
+        await auction_timer.extend_auction_timer(auction_id, 30)
+    
+    # Broadcast bid update via WebSocket
+    await manager.broadcast_bid_update(auction_id, bid.dict())
+    
+    # Check achievements
+    await achievement_manager.check_achievements(
+        current_user.id, 
+        "place_bid", 
+        {"amount": bid_data.amount, "auction_id": auction_id}, 
+        db
+    )
+    
     return bid
 
 @api_router.get("/auctions/{auction_id}/bids", response_model=List[Bid])
 async def get_auction_bids(auction_id: str):
     bids = await db.bids.find({"auction_id": auction_id}).sort("timestamp", -1).to_list(100)
     return [Bid(**bid) for bid in bids]
+
+# New Achievement routes
+@api_router.get("/achievements", response_model=List[Achievement])
+async def get_user_achievements(current_user: User = Depends(get_current_user)):
+    achievements = await achievement_manager.get_user_achievements(current_user.id, db)
+    return achievements
+
+@api_router.get("/achievements/progress")
+async def get_achievement_progress(current_user: User = Depends(get_current_user)):
+    progress = await achievement_manager.get_achievement_progress(current_user.id, db)
+    return progress
+
+# Statistics routes
+@api_router.get("/stats/live")
+async def get_live_stats():
+    total_users = await db.users.count_documents({})
+    online_users = await db.users.count_documents({"is_online": True})
+    active_auctions = await db.auctions.count_documents({"is_active": True})
+    total_tournaments = await db.tournaments.count_documents({})
+    
+    return {
+        "total_users": total_users,
+        "online_users": online_users,
+        "active_auctions": active_auctions,
+        "total_tournaments": total_tournaments,
+        "websocket_connections": manager.get_online_users_count()
+    }
 
 # Include the router in the main app
 app.include_router(api_router)
@@ -578,7 +713,7 @@ logger = logging.getLogger(__name__)
 @app.on_event("startup")
 async def startup_event():
     await init_db()
-    logger.info("SportX Cricket Auction API started")
+    logger.info("SportX Cricket Auction API started with WebSocket support")
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
