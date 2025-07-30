@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SportX Feedback Form</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            max-width: 600px; margin: 20px auto; padding: 20px;
+            background: linear-gradient(135deg, #1e40af, #7c3aed);
+            color: white;
+        }
+        .form-card {
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        h1 { text-align: center; margin-bottom: 30px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; }
+        input, textarea, select { 
+            width: 100%; padding: 12px; border-radius: 8px; 
+            border: 1px solid rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+        input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.7); }
+        .rating { display: flex; gap: 10px; align-items: center; }
+        .rating input { width: auto; }
+        button { 
+            background: #10b981; color: white; padding: 15px 30px;
+            border: none; border-radius: 8px; font-size: 16px;
+            cursor: pointer; width: 100%; font-weight: 600;
+        }
+        button:hover { background: #059669; }
+        .emoji { font-size: 24px; margin-right: 10px; }
+    </style>
+</head>
+<body>
+    <div class="form-card">
+        <h1>🏏 SportX Cricket Auction Feedback</h1>
+        
+        <form id="feedbackForm">
+            <div class="form-group">
+                <label>👤 Your Name (Optional)</label>
+                <input type="text" name="name" placeholder="Enter your name">
+            </div>
+            
+            <div class="form-group">
+                <label>📱 Device Used</label>
+                <select name="device" required>
+                    <option value="">Select device...</option>
+                    <option value="iPhone">iPhone</option>
+                    <option value="Android">Android Phone</option>
+                    <option value="Desktop">Desktop/Laptop</option>
+                    <option value="Tablet">Tablet</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>⭐ Overall Experience (1-10)</label>
+                <div class="rating">
+                    <input type="range" name="overall_rating" min="1" max="10" value="5" id="overallRange">
+                    <span id="overallValue">5</span>/10
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>😊 What did you like most?</label>
+                <textarea name="liked_most" rows="3" placeholder="What was the best part of the experience?"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>😕 What was most confusing or frustrating?</label>
+                <textarea name="issues" rows="3" placeholder="Any problems, bugs, or confusing parts?"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>🏆 How was the tournament/auction experience?</label>
+                <select name="tournament_experience" required>
+                    <option value="">Select...</option>
+                    <option value="Excellent">🔥 Excellent - Super fun!</option>
+                    <option value="Good">✅ Good - Enjoyable</option>
+                    <option value="Okay">😐 Okay - It was fine</option>
+                    <option value="Poor">😞 Poor - Not great</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>📱 Mobile vs Desktop Preference</label>
+                <select name="device_preference">
+                    <option value="">Select...</option>
+                    <option value="Mobile">📱 Mobile was better</option>
+                    <option value="Desktop">💻 Desktop was better</option>
+                    <option value="Both">👍 Both were good</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>🚀 Would you use this app with friends regularly?</label>
+                <select name="would_use" required>
+                    <option value="">Select...</option>
+                    <option value="Definitely">🔥 Definitely!</option>
+                    <option value="Probably">✅ Probably</option>
+                    <option value="Maybe">🤔 Maybe</option>
+                    <option value="Unlikely">😐 Unlikely</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>💡 Top improvement suggestion</label>
+                <textarea name="improvement" rows="3" placeholder="What would make this app even better?"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>🐛 Any bugs or technical issues?</label>
+                <textarea name="bugs" rows="2" placeholder="Describe any errors, crashes, or things that didn't work"></textarea>
+            </div>
+            
+            <button type="submit">🏏 Submit Feedback</button>
+        </form>
+        
+        <p style="text-align: center; margin-top: 20px; opacity: 0.8;">
+            Thanks for testing SportX! Your feedback helps make it better! 🙏
+        </p>
+    </div>
+
+    <script>
+        // Update rating display
+        document.getElementById('overallRange').addEventListener('input', function() {
+            document.getElementById('overallValue').textContent = this.value;
+        });
+        
+        // Handle form submission
+        document.getElementById('feedbackForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Collect form data
+            const formData = new FormData(this);
+            const feedback = {};
+            for (let [key, value] of formData.entries()) {
+                feedback[key] = value;
+            }
+            
+            // For now, just show the feedback (in production, send to server)
+            console.log('Feedback collected:', feedback);
+            
+            // Show success message
+            alert('🙏 Thank you for your feedback! This will help improve SportX.');
+            
+            // Optional: Send to your backend or Google Forms
+            // fetch('/api/feedback', { method: 'POST', body: JSON.stringify(feedback) });
+        });
+    </script>
+</body>
+</html>
