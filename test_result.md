@@ -101,3 +101,49 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: Tournament creation doesn't work - when user clicks "Create Tournament" button, it should create actual tournaments via backend API instead of using mock data.
+
+backend:
+  - task: "Tournament Creation API"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: true
+          agent: "main"
+          comment: "Backend API endpoints exist at /api/tournaments with proper models and validation. Tournament creation, joining, and retrieval endpoints are implemented."
+
+frontend:
+  - task: "Tournament Creation Frontend Integration"
+    implemented: false
+    working: false
+    file: "/app/frontend/src/pages/Tournaments.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: false
+          agent: "main"
+          comment: "Frontend has TournamentCreateModal component properly integrated, but handleCreateTournament function uses mock data instead of calling backend API. Need to implement API calls."
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "Tournament Creation Frontend Integration"
+    - "Tournament Creation API"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+    - agent: "main"
+      message: "Identified the issue: Frontend creates tournaments in local state instead of calling backend API. Backend API is implemented correctly. Need to update frontend to use proper API calls and test the complete flow."
