@@ -218,12 +218,18 @@ const Tournaments = () => {
           <div>
             <h1 className="text-3xl font-bold">Cricket Tournaments</h1>
             <p className="text-muted-foreground">Create and join strategic cricket tournaments</p>
+            {error && (
+              <p className="text-sm text-red-500 mt-1">
+                ⚠️ {error} - Using offline mode
+              </p>
+            )}
           </div>
           <div className="flex gap-3 mt-4 md:mt-0">
             <Button 
               variant="outline"
               onClick={() => alert("Quick tournament creation coming soon!")}
               className="flex-1 md:flex-none"
+              disabled={loading}
             >
               <Zap className="mr-2 h-4 w-4" />
               Quick Test (5 Players)
@@ -232,6 +238,7 @@ const Tournaments = () => {
               variant="default"
               onClick={() => setShowCreateModal(true)}
               className="flex-1 md:flex-none"
+              disabled={loading}
             >
               <Plus className="mr-2 h-4 w-4" />
               Create Tournament
