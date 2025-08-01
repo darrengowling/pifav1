@@ -4,6 +4,7 @@ import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { Input } from "../components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
+import TournamentCreateModal from "../components/TournamentCreateModal";
 import { Calendar, Users, Trophy, Clock, Copy, Play, Search, Plus, Zap, Share2, AlertCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -12,6 +13,7 @@ const Tournaments = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [inviteCode, setInviteCode] = useState("");
   const [selectedTab, setSelectedTab] = useState("all");
+  const [showCreateModal, setShowCreateModal] = useState(false);
   const [tournaments, setTournaments] = useState([
     // Mock tournament data
     {
@@ -82,14 +84,52 @@ const Tournaments = () => {
     }
   ]);
 
-  const handleCreateTournament = (tournamentData) => {
-    const newTournament = {
-      ...tournamentData,
-      id: Date.now().toString(),
-      createdAt: new Date()
-    };
-    
-    setTournaments(prev => [newTournament, ...prev]);
+  const handleCreateTournament = async (tournamentData) => {
+    try {
+      // Generate a unique ID and invite code
+      const newTournament = {
+        ...tournamentData,
+        id: Date.now().toString(),
+        sport: "cricket",
+        admin: "Current User",
+        participants: [
+          {
+            id: "current-user",
+            name: "You",
+            budget: tournamentData.budget,
+            squad: [],
+            userId: "current-user",
+            isAdmin: true,
+            inviteStatus: "accepted",
+            currentBudget: tournamentData.budget,
+            totalScore: 0
+          }
+        ],
+        status: "setup",
+        createdAt: new Date(),
+        inviteCode: generateInviteCode()
+      };
+      
+      setTournaments(prev => [newTournament, ...prev]);
+      
+      // Show success message
+      alert(`🏏 Tournament "${newTournament.name}" created successfully! Invite Code: ${newTournament.inviteCode}`);
+      
+      return newTournament;
+    } catch (error) {
+      console.error('Error creating tournament:', error);
+      alert('Failed to create tournament. Please try again.');
+      throw error;
+    }
+  };
+
+  const generateInviteCode = () => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let result = '';
+    for (let i = 0; i < 6; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
   };
 
   const handleJoinTournament = (tournamentId) => {
@@ -197,7 +237,7 @@ const Tournaments = () => {
             </Button>
             <Button 
               variant="default"
-              onClick={() => alert("Tournament creation coming soon!")}
+              onClick={() => setShowCreateModal(true)}
               className="flex-1 md:flex-none"
             >
               <Plus className="mr-2 h-4 w-4" />
@@ -205,6 +245,13 @@ const Tournaments = () => {
             </Button>
           </div>
         </div>
+
+        {/* Tournament Creation Modal */}
+        <TournamentCreateModal
+          isOpen={showCreateModal}
+          onClose={() => setShowCreateModal(false)}
+          onCreateTournament={handleCreateTournament}
+        />
 
         {/* Join with Invite Code */}
         <Card className="p-4 mb-6">
