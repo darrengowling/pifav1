@@ -4,7 +4,7 @@ import json
 from datetime import datetime
 
 class SportXAPITester:
-    def __init__(self, base_url="https://5047e2a6-53c6-426a-af88-990590a8dabe.preview.emergentagent.com/api"):
+    def __init__(self, base_url="https://50234383-3ebe-4c2f-a36a-3cf8628b1fd8.preview.emergentagent.com/api"):
         self.base_url = base_url
         self.token = None
         self.tests_run = 0
