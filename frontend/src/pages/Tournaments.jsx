@@ -256,8 +256,22 @@ const Tournaments = () => {
                 ⚠️ {error} - Using offline mode
               </p>
             )}
+            {!isAuthenticated && (
+              <p className="text-sm text-orange-600 mt-1">
+                🔐 Click "Quick Auth" to enable tournament creation
+              </p>
+            )}
           </div>
           <div className="flex gap-3 mt-4 md:mt-0">
+            {!isAuthenticated && (
+              <Button 
+                variant="secondary"
+                onClick={quickAuth}
+                className="flex-1 md:flex-none"
+              >
+                🔐 Quick Auth
+              </Button>
+            )}
             <Button 
               variant="outline"
               onClick={() => alert("Quick tournament creation coming soon!")}
@@ -269,7 +283,13 @@ const Tournaments = () => {
             </Button>
             <Button 
               variant="default"
-              onClick={() => setShowCreateModal(true)}
+              onClick={() => {
+                if (!isAuthenticated) {
+                  alert("Please authenticate first by clicking 'Quick Auth' button.");
+                  return;
+                }
+                setShowCreateModal(true);
+              }}
               className="flex-1 md:flex-none"
               disabled={loading}
             >
