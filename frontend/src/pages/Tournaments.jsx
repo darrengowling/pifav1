@@ -334,154 +334,176 @@ const Tournaments = () => {
         </Tabs>
 
         {/* Tournaments Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredTournaments.length > 0 ? (
-            filteredTournaments.map((tournament) => (
-              <Card key={tournament.id} className="hover:shadow-md transition-shadow">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <CardTitle className="text-lg mb-1">{tournament.name}</CardTitle>
-                      <div className="text-sm text-muted-foreground mb-2">
-                        Based on {tournament.realLifeTournament}
-                      </div>
-                      <div className="flex items-center gap-2 mb-2">
-                        <Badge variant={
-                          tournament.status === 'active' ? 'default' : 
-                          tournament.status === 'auction_scheduled' ? 'secondary' : 
-                          'outline'
-                        }>
-                          {tournament.status === 'setup' ? 'Setup' :
-                           tournament.status === 'auction_scheduled' ? 'Auction Scheduled' :
-                           tournament.status === 'active' ? 'Live' : 'Completed'}
-                        </Badge>
-                        <span className="text-sm text-muted-foreground">
-                          by {tournament.admin}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <Users className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm">
-                        {tournament.participants.length}/{tournament.maxParticipants} players
-                      </span>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span>Budget:</span>
-                      <span className="font-medium">{tournament.budget.toLocaleString()}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Squad Size:</span>
-                      <span className="font-medium">
-                        {tournament.squadComposition.batsmen + tournament.squadComposition.bowlers + 
-                         tournament.squadComposition.allRounders + tournament.squadComposition.wicketKeepers} players
-                      </span>
-                    </div>
-                    {tournament.inviteCode && (
-                      <div className="flex justify-between items-center">
-                        <span>Invite Code:</span>
-                        <div className="flex items-center gap-2">
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="h-auto p-1 font-mono text-primary font-bold"
-                            onClick={() => copyInviteCode(tournament.inviteCode)}
-                          >
-                            {tournament.inviteCode}
-                            <Copy className="ml-1 h-3 w-3" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={async (e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              
-                              try {
-                                const shareText = `Join my cricket tournament "${tournament.name}"! Use invite code: ${tournament.inviteCode}`;
-                                
-                                if (navigator.clipboard && navigator.clipboard.writeText) {
-                                  await navigator.clipboard.writeText(shareText);
-                                  alert("Invite message copied to clipboard! Share it with friends.");
-                                } else {
-                                  const textArea = document.createElement('textarea');
-                                  textArea.value = shareText;
-                                  document.body.appendChild(textArea);
-                                  textArea.focus();
-                                  textArea.select();
-                                  document.execCommand('copy');
-                                  document.body.removeChild(textArea);
-                                  alert("Invite message copied! Share it with friends.");
-                                }
-                              } catch (error) {
-                                console.error("Share error:", error);
-                                alert(`Share failed: ${error.message || 'Unknown error'}`);
-                              }
-                            }}
-                            title="Invite Players - Click to copy invite message"
-                          >
-                            <Share2 className="h-3 w-3" />
-                          </Button>
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mr-3" />
+            <span>Loading tournaments...</span>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredTournaments.length > 0 ? (
+              filteredTournaments.map((tournament) => {
+                // Normalize tournament data to handle backend vs mock data differences
+                const normalizedTournament = {
+                  ...tournament,
+                  realLifeTournament: tournament.real_life_tournament || tournament.realLifeTournament,
+                  maxParticipants: tournament.max_participants || tournament.maxParticipants,
+                  squadComposition: tournament.squad_composition || tournament.squadComposition,
+                  inviteCode: tournament.invite_code || tournament.inviteCode,
+                  admin: tournament.admin || (tournament.participants?.find(p => p.is_admin)?.username) || "Unknown"
+                };
+                
+                return (
+                  <Card key={tournament.id} className="hover:shadow-md transition-shadow">
+                    <CardHeader>
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <CardTitle className="text-lg mb-1">{normalizedTournament.name}</CardTitle>
+                          <div className="text-sm text-muted-foreground mb-2">
+                            Based on {normalizedTournament.realLifeTournament}
+                          </div>
+                          <div className="flex items-center gap-2 mb-2">
+                            <Badge variant={
+                              normalizedTournament.status === 'active' ? 'default' : 
+                              normalizedTournament.status === 'auction_scheduled' ? 'secondary' : 
+                              'outline'
+                            }>
+                              {normalizedTournament.status === 'setup' ? 'Setup' :
+                               normalizedTournament.status === 'auction_scheduled' ? 'Auction Scheduled' :
+                               normalizedTournament.status === 'active' ? 'Live' : 'Completed'}
+                            </Badge>
+                            <span className="text-sm text-muted-foreground">
+                              by {normalizedTournament.admin}
+                            </span>
+                          </div>
                         </div>
                       </div>
-                    )}
-                  </div>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <Users className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-sm">
+                            {normalizedTournament.participants?.length || 0}/{normalizedTournament.maxParticipants} players
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span>Budget:</span>
+                          <span className="font-medium">{normalizedTournament.budget?.toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Squad Size:</span>
+                          <span className="font-medium">
+                            {normalizedTournament.squadComposition ? 
+                              (normalizedTournament.squadComposition.batsmen + normalizedTournament.squadComposition.bowlers + 
+                               (normalizedTournament.squadComposition.allRounders || normalizedTournament.squadComposition.all_rounders || 0) + 
+                               (normalizedTournament.squadComposition.wicketKeepers || normalizedTournament.squadComposition.wicket_keepers || 0)) : 11
+                            } players
+                          </span>
+                        </div>
+                        {normalizedTournament.inviteCode && (
+                          <div className="flex justify-between items-center">
+                            <span>Invite Code:</span>
+                            <div className="flex items-center gap-2">
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="h-auto p-1 font-mono text-primary font-bold"
+                                onClick={() => copyInviteCode(normalizedTournament.inviteCode)}
+                              >
+                                {normalizedTournament.inviteCode}
+                                <Copy className="ml-1 h-3 w-3" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={async (e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  
+                                  try {
+                                    const shareText = `Join my cricket tournament "${normalizedTournament.name}"! Use invite code: ${normalizedTournament.inviteCode}`;
+                                    
+                                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                                      await navigator.clipboard.writeText(shareText);
+                                      alert("Invite message copied to clipboard! Share it with friends.");
+                                    } else {
+                                      const textArea = document.createElement('textarea');
+                                      textArea.value = shareText;
+                                      document.body.appendChild(textArea);
+                                      textArea.focus();
+                                      textArea.select();
+                                      document.execCommand('copy');
+                                      document.body.removeChild(textArea);
+                                      alert("Invite message copied! Share it with friends.");
+                                    }
+                                  } catch (error) {
+                                    console.error("Share error:", error);
+                                    alert(`Share failed: ${error.message || 'Unknown error'}`);
+                                  }
+                                }}
+                                title="Invite Players - Click to copy invite message"
+                              >
+                                <Share2 className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
 
-                  {/* Status-specific actions */}
-                  {tournament.status === 'setup' && tournament.participants.length < 2 && tournament.admin === "Current User" && (
-                    <div className="flex items-center gap-2 p-3 bg-warning/10 border border-warning/20 rounded-lg mb-3">
-                      <AlertCircle className="h-4 w-4 text-warning" />
-                      <span className="text-sm text-warning">Need at least 2 players to start auction</span>
-                    </div>
-                  )}
+                      {/* Status-specific actions */}
+                      {normalizedTournament.status === 'setup' && (normalizedTournament.participants?.length || 0) < 2 && normalizedTournament.admin === "Current User" && (
+                        <div className="flex items-center gap-2 p-3 bg-warning/10 border border-warning/20 rounded-lg mb-3">
+                          <AlertCircle className="h-4 w-4 text-warning" />
+                          <span className="text-sm text-warning">Need at least 2 players to start auction</span>
+                        </div>
+                      )}
 
-                  <div className="flex gap-2">
-                    {tournament.admin === "Current User" ? (
-                      <Button 
-                        className="flex-1" 
-                        onClick={() => handleStartAuction(tournament.id)}
-                        disabled={tournament.participants.length < 2}
-                        variant={tournament.participants.length >= 2 ? "default" : "outline"}
-                      >
-                        <Play className="mr-2 h-4 w-4" />
-                        {tournament.status === 'setup' ? 'Start Auction' : 'Enter Auction'}
-                      </Button>
-                    ) : (
-                      <Button 
-                        variant="outline" 
-                        className="flex-1"
-                        onClick={() => handleJoinTournament(tournament.id)}
-                        disabled={tournament.participants.length >= tournament.maxParticipants}
-                      >
-                        {tournament.participants.some(p => p.name === "You") ? "✓ Joined" : "Join Tournament"}
-                      </Button>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            ))
-          ) : (
-            <div className="col-span-full text-center py-12">
-              <div className="text-muted-foreground mb-4">No tournaments found</div>
-              <Button 
-                variant="outline" 
-                onClick={() => {
-                  setSearchTerm("");
-                  setSelectedTab("all");
-                }}
-              >
-                Clear Search
-              </Button>
-            </div>
-          )}
-        </div>
+                      <div className="flex gap-2">
+                        {normalizedTournament.admin === "Current User" ? (
+                          <Button 
+                            className="flex-1" 
+                            onClick={() => handleStartAuction(normalizedTournament.id)}
+                            disabled={(normalizedTournament.participants?.length || 0) < 2}
+                            variant={(normalizedTournament.participants?.length || 0) >= 2 ? "default" : "outline"}
+                          >
+                            <Play className="mr-2 h-4 w-4" />
+                            {normalizedTournament.status === 'setup' ? 'Start Auction' : 'Enter Auction'}
+                          </Button>
+                        ) : (
+                          <Button 
+                            variant="outline" 
+                            className="flex-1"
+                            onClick={() => handleJoinTournament(normalizedTournament.id)}
+                            disabled={(normalizedTournament.participants?.length || 0) >= normalizedTournament.maxParticipants}
+                          >
+                            {normalizedTournament.participants?.some(p => p.name === "You") ? "✓ Joined" : "Join Tournament"}
+                          </Button>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })
+            ) : (
+              <div className="col-span-full text-center py-12">
+                <div className="text-muted-foreground mb-4">No tournaments found</div>
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setSearchTerm("");
+                    setSelectedTab("all");
+                  }}
+                >
+                  Clear Search
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
