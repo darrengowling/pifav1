@@ -18,19 +18,58 @@ const Tournaments = () => {
   const [tournaments, setTournaments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || import.meta.env.REACT_APP_BACKEND_URL;
+  // Check authentication status
+  useEffect(() => {
+    const token = localStorage.getItem('authToken');
+    setIsAuthenticated(!!token);
+  }, []);
+
+  // Quick authentication for testing
+  const quickAuth = async () => {
+    try {
+      // Create a test user
+      const timestamp = Date.now();
+      const testUser = {
+        username: `test_user_${timestamp}`,
+        email: `test_${timestamp}@sportx.com`,
+        password: "TestPass123!"
+      };
+
+      try {
+        // Try to register
+        await authApi.register(testUser);
+      } catch (registerError) {
+        // If registration fails (user exists), ignore and try login
+        console.log("Registration failed, trying login:", registerError.response?.data);
+      }
+
+      // Try to login
+      const loginResponse = await authApi.login({
+        email: testUser.email,
+        password: testUser.password
+      });
+
+      const token = loginResponse.data.access_token;
+      localStorage.setItem('authToken', token);
+      setIsAuthenticated(true);
+      alert("✅ Authenticated successfully! You can now create tournaments.");
+      
+      // Refresh tournaments after authentication
+      fetchTournaments();
+    } catch (error) {
+      console.error('Authentication error:', error);
+      alert(`Authentication failed: ${error.response?.data?.detail || error.message}`);
+    }
+  };
 
   // Fetch tournaments from backend
   const fetchTournaments = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${BACKEND_URL}/api/tournaments`);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      setTournaments(data);
+      const response = await tournamentsApi.getAll();
+      setTournaments(response.data);
       setError(null);
     } catch (error) {
       console.error('Error fetching tournaments:', error);
@@ -41,25 +80,25 @@ const Tournaments = () => {
           id: "1",
           name: "IPL 2024 Championship",
           sport: "cricket",
-          realLifeTournament: "IPL 2024",
+          real_life_tournament: "IPL 2024",
           admin: "Current User",
           participants: [
-            { id: "1", name: "You", budget: 100000, squad: [], userId: "1", isAdmin: false, inviteStatus: "accepted", currentBudget: 100000, totalScore: 0 },
-            { id: "2", name: "Alex Kumar", budget: 100000, squad: [], userId: "2", isAdmin: false, inviteStatus: "accepted", currentBudget: 100000, totalScore: 0 }
+            { id: "1", name: "You", budget: 100000, squad: [], user_id: "1", is_admin: false, invite_status: "accepted", current_budget: 100000, total_score: 0 },
+            { id: "2", name: "Alex Kumar", budget: 100000, squad: [], user_id: "2", is_admin: false, invite_status: "accepted", current_budget: 100000, total_score: 0 }
           ],
-          maxParticipants: 10,
+          max_participants: 10,
           status: "setup",
           budget: 100000,
-          squadComposition: {
+          squad_composition: {
             batsmen: 4,
             bowlers: 4,
-            allRounders: 2,
-            wicketKeepers: 1
+            all_rounders: 2,
+            wicket_keepers: 1
           },
-          auctionDate: new Date("2024-03-15T18:00:00"),
-          auctionDuration: 2,
-          createdAt: new Date("2024-03-01"),
-          inviteCode: "ABC123"
+          auction_date: new Date("2024-03-15T18:00:00"),
+          auction_duration: 2,
+          created_at: new Date("2024-03-01"),
+          invite_code: "ABC123"
         }
       ]);
     } finally {
@@ -74,45 +113,38 @@ const Tournaments = () => {
 
   const handleCreateTournament = async (tournamentData) => {
     try {
-      const response = await fetch(`${BACKEND_URL}/api/tournaments`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          // TODO: Add authentication token when auth is implemented
-        },
-        body: JSON.stringify({
-          name: tournamentData.name,
-          description: tournamentData.description,
-          real_life_tournament: tournamentData.realLifeTournament,
-          max_participants: tournamentData.maxParticipants,
-          budget: tournamentData.budget,
-          squad_composition: {
-            batsmen: tournamentData.squadComposition.batsmen,
-            bowlers: tournamentData.squadComposition.bowlers,
-            all_rounders: tournamentData.squadComposition.allRounders,
-            wicket_keepers: tournamentData.squadComposition.wicketKeepers
-          },
-          auction_duration: tournamentData.auctionDuration
-        })
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+      if (!isAuthenticated) {
+        alert("Please authenticate first to create tournaments.");
+        return;
       }
 
-      const newTournament = await response.json();
+      const response = await tournamentsApi.create({
+        name: tournamentData.name,
+        description: tournamentData.description,
+        real_life_tournament: tournamentData.realLifeTournament,
+        max_participants: tournamentData.maxParticipants,
+        budget: tournamentData.budget,
+        squad_composition: {
+          batsmen: tournamentData.squadComposition.batsmen,
+          bowlers: tournamentData.squadComposition.bowlers,
+          all_rounders: tournamentData.squadComposition.allRounders,
+          wicket_keepers: tournamentData.squadComposition.wicketKeepers
+        },
+        auction_duration: tournamentData.auctionDuration
+      });
+
+      const newTournament = response.data;
       
       // Update local state with new tournament
       setTournaments(prev => [newTournament, ...prev]);
       
       // Show success message
-      alert(`🏏 Tournament "${newTournament.name}" created successfully! Invite Code: ${newTournament.invite_code || newTournament.inviteCode || 'N/A'}`);
+      alert(`🏏 Tournament "${newTournament.name}" created successfully! Invite Code: ${newTournament.invite_code || 'N/A'}`);
       
       return newTournament;
     } catch (error) {
       console.error('Error creating tournament:', error);
-      alert(`Failed to create tournament: ${error.message}`);
+      alert(`Failed to create tournament: ${error.response?.data?.detail || error.message}`);
       throw error;
     }
   };
