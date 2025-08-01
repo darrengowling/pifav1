@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
 import TournamentCreateModal from "../components/TournamentCreateModal";
 import { Calendar, Users, Trophy, Clock, Copy, Play, Search, Plus, Zap, Share2, AlertCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { tournamentsApi, authApi } from "../lib/api";
 
 const Tournaments = () => {
   const navigate = useNavigate();
