@@ -403,7 +403,17 @@ const Tournaments = () => {
                   maxParticipants: tournament.max_participants || tournament.maxParticipants,
                   squadComposition: tournament.squad_composition || tournament.squadComposition,
                   inviteCode: tournament.invite_code || tournament.inviteCode,
-                  admin: tournament.admin || (tournament.participants?.find(p => p.is_admin)?.username) || "Unknown"
+                  admin: tournament.admin || (tournament.participants?.find(p => p.is_admin || p.isAdmin)?.username) || "Unknown",
+                  // Normalize participant data
+                  participants: (tournament.participants || []).map(p => ({
+                    ...p,
+                    name: p.username || p.name,
+                    userId: p.user_id || p.userId,
+                    isAdmin: p.is_admin || p.isAdmin,
+                    inviteStatus: p.invite_status || p.inviteStatus,
+                    currentBudget: p.current_budget || p.currentBudget,
+                    totalScore: p.total_score || p.totalScore
+                  }))
                 };
                 
                 return (
