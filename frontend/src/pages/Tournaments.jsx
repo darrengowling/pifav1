@@ -14,111 +14,104 @@ const Tournaments = () => {
   const [inviteCode, setInviteCode] = useState("");
   const [selectedTab, setSelectedTab] = useState("all");
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [tournaments, setTournaments] = useState([
-    // Mock tournament data
-    {
-      id: "1",
-      name: "IPL 2024 Championship",
-      sport: "cricket",
-      realLifeTournament: "IPL 2024",
-      admin: "Current User",
-      participants: [
-        { id: "1", name: "You", budget: 100000, squad: [], userId: "1", isAdmin: false, inviteStatus: "accepted", currentBudget: 100000, totalScore: 0 },
-        { id: "2", name: "Alex Kumar", budget: 100000, squad: [], userId: "2", isAdmin: false, inviteStatus: "accepted", currentBudget: 100000, totalScore: 0 }
-      ],
-      maxParticipants: 10,
-      status: "setup",
-      budget: 100000,
-      squadComposition: {
-        batsmen: 4,
-        bowlers: 4,
-        allRounders: 2,
-        wicketKeepers: 1
-      },
-      auctionDate: new Date("2024-03-15T18:00:00"),
-      auctionDuration: 2,
-      createdAt: new Date("2024-03-01"),
-      inviteCode: "ABC123"
-    },
-    {
-      id: "2", 
-      name: "Australia vs India Test Series",
-      sport: "cricket",
-      realLifeTournament: "Border-Gavaskar Trophy 2024",
-      admin: "Sarah Smith",
-      participants: [],
-      maxParticipants: 8,
-      status: "auction_scheduled",
-      budget: 80000,
-      squadComposition: {
-        batsmen: 4,
-        bowlers: 4,
-        allRounders: 2,
-        wicketKeepers: 1
-      },
-      auctionDate: new Date("2024-03-20T19:30:00"),
-      auctionDuration: 1.5,
-      createdAt: new Date("2024-03-02"),
-      inviteCode: "XYZ789"
-    },
-    {
-      id: "3",
-      name: "Big Bash League Pro",
-      sport: "cricket", 
-      realLifeTournament: "BBL 2024",
-      admin: "Mike Johnson",
-      participants: [],
-      maxParticipants: 12,
-      status: "active",
-      budget: 120000,
-      squadComposition: {
-        batsmen: 3,
-        bowlers: 4,
-        allRounders: 3,
-        wicketKeepers: 1
-      },
-      auctionDate: new Date("2024-03-10T17:00:00"),
-      auctionDuration: 2,
-      createdAt: new Date("2024-02-28"),
-      inviteCode: "DEF456"
+  const [tournaments, setTournaments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || import.meta.env.REACT_APP_BACKEND_URL;
+
+  // Fetch tournaments from backend
+  const fetchTournaments = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${BACKEND_URL}/api/tournaments`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      setTournaments(data);
+      setError(null);
+    } catch (error) {
+      console.error('Error fetching tournaments:', error);
+      setError('Failed to load tournaments');
+      // Keep using mock data if API fails
+      setTournaments([
+        {
+          id: "1",
+          name: "IPL 2024 Championship",
+          sport: "cricket",
+          realLifeTournament: "IPL 2024",
+          admin: "Current User",
+          participants: [
+            { id: "1", name: "You", budget: 100000, squad: [], userId: "1", isAdmin: false, inviteStatus: "accepted", currentBudget: 100000, totalScore: 0 },
+            { id: "2", name: "Alex Kumar", budget: 100000, squad: [], userId: "2", isAdmin: false, inviteStatus: "accepted", currentBudget: 100000, totalScore: 0 }
+          ],
+          maxParticipants: 10,
+          status: "setup",
+          budget: 100000,
+          squadComposition: {
+            batsmen: 4,
+            bowlers: 4,
+            allRounders: 2,
+            wicketKeepers: 1
+          },
+          auctionDate: new Date("2024-03-15T18:00:00"),
+          auctionDuration: 2,
+          createdAt: new Date("2024-03-01"),
+          inviteCode: "ABC123"
+        }
+      ]);
+    } finally {
+      setLoading(false);
     }
-  ]);
+  };
+
+  // Load tournaments on component mount
+  useEffect(() => {
+    fetchTournaments();
+  }, []);
 
   const handleCreateTournament = async (tournamentData) => {
     try {
-      // Generate a unique ID and invite code
-      const newTournament = {
-        ...tournamentData,
-        id: Date.now().toString(),
-        sport: "cricket",
-        admin: "Current User",
-        participants: [
-          {
-            id: "current-user",
-            name: "You",
-            budget: tournamentData.budget,
-            squad: [],
-            userId: "current-user",
-            isAdmin: true,
-            inviteStatus: "accepted",
-            currentBudget: tournamentData.budget,
-            totalScore: 0
-          }
-        ],
-        status: "setup",
-        createdAt: new Date(),
-        inviteCode: generateInviteCode()
-      };
+      const response = await fetch(`${BACKEND_URL}/api/tournaments`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // TODO: Add authentication token when auth is implemented
+        },
+        body: JSON.stringify({
+          name: tournamentData.name,
+          description: tournamentData.description,
+          real_life_tournament: tournamentData.realLifeTournament,
+          max_participants: tournamentData.maxParticipants,
+          budget: tournamentData.budget,
+          squad_composition: {
+            batsmen: tournamentData.squadComposition.batsmen,
+            bowlers: tournamentData.squadComposition.bowlers,
+            all_rounders: tournamentData.squadComposition.allRounders,
+            wicket_keepers: tournamentData.squadComposition.wicketKeepers
+          },
+          auction_duration: tournamentData.auctionDuration
+        })
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+      }
+
+      const newTournament = await response.json();
       
+      // Update local state with new tournament
       setTournaments(prev => [newTournament, ...prev]);
       
       // Show success message
-      alert(`🏏 Tournament "${newTournament.name}" created successfully! Invite Code: ${newTournament.inviteCode}`);
+      alert(`🏏 Tournament "${newTournament.name}" created successfully! Invite Code: ${newTournament.invite_code || newTournament.inviteCode || 'N/A'}`);
       
       return newTournament;
     } catch (error) {
       console.error('Error creating tournament:', error);
-      alert('Failed to create tournament. Please try again.');
+      alert(`Failed to create tournament: ${error.message}`);
       throw error;
     }
   };
