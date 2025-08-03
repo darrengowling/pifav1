@@ -54,6 +54,7 @@ function App() {
                   </ErrorBoundary>
                 } />
                 <Route path="/how-it-works" element={<HowItWorks />} />
+                <Route path="/testing" element={<TestingGuide />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </ErrorBoundary>
