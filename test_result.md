@@ -225,10 +225,8 @@ metadata:
 
 test_plan:
   current_focus:
-    - "CricData API Integration - Player Population"
-    - "CricData API Integration - Error Handling"
-  stuck_tasks:
-    - "CricData API Integration - Player Population"
+    - "CricData API Integration - Live Cricket Data"
+  stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
