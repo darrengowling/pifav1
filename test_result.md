@@ -273,7 +273,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "CricData API Integration - Live Cricket Data"
+    - "Auction Creation API"
+    - "Auction Authentication & Authorization"
+    - "Auction Validation System"
+    - "Auction Listing & Retrieval"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
