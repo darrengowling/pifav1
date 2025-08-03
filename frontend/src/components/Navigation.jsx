@@ -12,6 +12,7 @@ const Navigation = () => {
     { path: "/how-it-works", icon: HelpCircle, label: "How it Works" },
     { path: "/tournaments", icon: Trophy, label: "Tournaments" },
     { path: "/auctions", icon: User, label: "Auctions" },
+    { path: "/testing", icon: TestTube, label: "Testing Guide" },
   ];
 
   const handleNavigation = (path) => {
