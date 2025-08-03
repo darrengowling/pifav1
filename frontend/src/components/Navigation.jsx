@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "./ui/button";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Home, Trophy, Users, Settings, User, HelpCircle } from "lucide-react";
+import { Home, Trophy, Users, Settings, User, HelpCircle, TestTube } from "lucide-react";
 
 const Navigation = () => {
   const location = useLocation();
