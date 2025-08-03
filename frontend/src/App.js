@@ -9,6 +9,7 @@ import Tournaments from "./pages/Tournaments";
 import Auctions from "./pages/Auctions";
 import AuctionRoom from "./pages/AuctionRoom";
 import HowItWorks from "./pages/HowItWorks";
+import TestingGuide from "./pages/TestingGuide";
 import NotFound from "./pages/NotFound";
 import "./App.css";
 
