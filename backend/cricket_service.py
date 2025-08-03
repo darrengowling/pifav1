@@ -17,8 +17,25 @@ class CricketService:
             if not api_data:
                 return None
             
+            # Check if API returned an error response
+            if isinstance(api_data, dict):
+                # Check for API error responses
+                if api_data.get('status') == 'failure':
+                    logger.warning(f"API returned failure for player {player_name}: {api_data.get('reason', 'Unknown error')}")
+                    return None
+                
+                # Check if this is an empty/invalid response
+                if not api_data.get("Player Name") and not api_data.get("name"):
+                    logger.warning(f"No valid player data found for {player_name}")
+                    return None
+            
             # Transform API data to our model
             player = self._transform_player_data(api_data)
+            
+            # Additional validation - if player name is still "Unknown", it means transformation failed
+            if player and player.name == "Unknown":
+                logger.warning(f"Player transformation resulted in 'Unknown' name for {player_name}")
+                return None
             
             logger.info(f"Player fetched from API: {player_name}")
             return player
