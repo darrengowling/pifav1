@@ -809,7 +809,7 @@ async def get_cricket_player_details(player_name: str):
         cricket_player = await cricket_service.get_player_by_name(player_name)
         
         if not cricket_player:
-            raise HTTPException(status_code=404, detail=f"Player '{player_name}' not found")
+            raise HTTPException(status_code=404, detail=f"Player '{player_name}' not found in cricket database")
         
         return {
             "success": True,
