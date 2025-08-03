@@ -42,16 +42,75 @@ const Home = () => {
       }}>
         <div className="container mx-auto px-4 py-8 md:py-20">
           <div className="text-center max-w-4xl mx-auto">
-            {/* England Cricket Logo */}
-            <div className="mb-8 flex justify-center">
-              <img 
-                src="https://customer-assets.emergentagent.com/job_cricket-bidding/artifacts/nu56dv79_192-1928338_england-cricket-team-logo-png-transparent-png.png"
-                alt="England Cricket Team Logo"
-                className="h-24 md:h-32 w-auto drop-shadow-2xl"
-                style={{
-                  filter: 'drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5))'
-                }}
-              />
+            {/* Cricket Playing Nations */}
+            <div className="mb-8">
+              {/* Main England Cricket Logo */}
+              <div className="flex justify-center mb-6">
+                <img 
+                  src="https://customer-assets.emergentagent.com/job_cricket-bidding/artifacts/nu56dv79_192-1928338_england-cricket-team-logo-png-transparent-png.png"
+                  alt="England Cricket Team Logo"
+                  className="h-24 md:h-32 w-auto drop-shadow-2xl"
+                  style={{
+                    filter: 'drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5))'
+                  }}
+                />
+              </div>
+              
+              {/* International Cricket Nations Row */}
+              <div className="flex justify-center items-center gap-4 md:gap-6 mb-4">
+                <div className="flex items-center gap-1 bg-white/10 px-3 py-2 rounded-full backdrop-blur-sm">
+                  <span className="text-2xl md:text-3xl">🏴󠁧󠁢󠁥󠁮󠁧󠁿</span>
+                  <span className="text-xs text-white/80 hidden md:inline">ENG</span>
+                </div>
+                <div className="flex items-center gap-1 bg-white/10 px-3 py-2 rounded-full backdrop-blur-sm">
+                  <span className="text-2xl md:text-3xl">🇦🇺</span>
+                  <span className="text-xs text-white/80 hidden md:inline">AUS</span>
+                </div>
+                <div className="flex items-center gap-1 bg-white/10 px-3 py-2 rounded-full backdrop-blur-sm">
+                  <span className="text-2xl md:text-3xl">🇮🇳</span>
+                  <span className="text-xs text-white/80 hidden md:inline">IND</span>
+                </div>
+                <div className="flex items-center gap-1 bg-white/10 px-3 py-2 rounded-full backdrop-blur-sm">
+                  <span className="text-2xl md:text-3xl">🇵🇰</span>
+                  <span className="text-xs text-white/80 hidden md:inline">PAK</span>
+                </div>
+                <div className="flex items-center gap-1 bg-white/10 px-3 py-2 rounded-full backdrop-blur-sm">
+                  <span className="text-2xl md:text-3xl">🇿🇦</span>
+                  <span className="text-xs text-white/80 hidden md:inline">RSA</span>
+                </div>
+                <div className="flex items-center gap-1 bg-white/10 px-3 py-2 rounded-full backdrop-blur-sm">
+                  <span className="text-2xl md:text-3xl">🇳🇿</span>
+                  <span className="text-xs text-white/80 hidden md:inline">NZ</span>
+                </div>
+              </div>
+              
+              {/* Second Row of Nations */}
+              <div className="flex justify-center items-center gap-4 md:gap-6 mb-6">
+                <div className="flex items-center gap-1 bg-white/10 px-3 py-2 rounded-full backdrop-blur-sm">
+                  <span className="text-2xl md:text-3xl">🏝️</span>
+                  <span className="text-xs text-white/80 hidden md:inline">WI</span>
+                </div>
+                <div className="flex items-center gap-1 bg-white/10 px-3 py-2 rounded-full backdrop-blur-sm">
+                  <span className="text-2xl md:text-3xl">🇱🇰</span>
+                  <span className="text-xs text-white/80 hidden md:inline">SL</span>
+                </div>
+                <div className="flex items-center gap-1 bg-white/10 px-3 py-2 rounded-full backdrop-blur-sm">
+                  <span className="text-2xl md:text-3xl">🇧🇩</span>
+                  <span className="text-xs text-white/80 hidden md:inline">BAN</span>
+                </div>
+                <div className="flex items-center gap-1 bg-white/10 px-3 py-2 rounded-full backdrop-blur-sm">
+                  <span className="text-2xl md:text-3xl">🇦🇫</span>
+                  <span className="text-xs text-white/80 hidden md:inline">AFG</span>
+                </div>
+                <div className="flex items-center gap-1 bg-white/10 px-3 py-2 rounded-full backdrop-blur-sm">
+                  <span className="text-2xl md:text-3xl">🇮🇪</span>
+                  <span className="text-xs text-white/80 hidden md:inline">IRE</span>
+                </div>
+              </div>
+              
+              <p className="text-sm text-white/70 mb-2">
+                🏏 Representing Cricket Nations Worldwide
+              </p>
             </div>
             
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
