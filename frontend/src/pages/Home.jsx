@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Button } from "../components/ui/button";
 import { sports } from "../data/sports";
 import RealTimeStats from "../components/RealTimeStats";
-import { TrendingUp, Trophy, Users, Zap } from "lucide-react";
+import { TrendingUp, Trophy, Users, Zap, TestTube } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const Home = () => {
