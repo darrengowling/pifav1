@@ -131,8 +131,8 @@ class SportXAPITester:
         return success
 
     def test_auctions_endpoints(self):
-        """Test auction-related endpoints"""
-        print("\n🔨 Testing Auction Endpoints...")
+        """Test auction-related endpoints - BASIC VERSION"""
+        print("\n🔨 Testing Basic Auction Endpoints...")
         
         # Get all auctions
         success, auctions = self.run_test(
@@ -145,6 +145,359 @@ class SportXAPITester:
             print(f"   Found {len(auctions)} auctions")
         
         return success
+
+    def test_auction_creation_comprehensive(self):
+        """COMPREHENSIVE AUCTION CREATION TESTING - USER PRIORITY REQUEST"""
+        print("\n🎯 COMPREHENSIVE AUCTION CREATION TESTING")
+        print("=" * 60)
+        
+        # Ensure we have authentication first
+        if not self.token:
+            print("❌ No authentication token available. Running auth first...")
+            if not self.test_authentication_endpoints():
+                print("❌ Authentication failed. Cannot test auction creation.")
+                return False
+        
+        # Step 1: Create a tournament first (needed for auction creation)
+        print("\n📋 STEP 1: Creating Tournament for Auction Testing...")
+        tournament_data = {
+            "name": "Auction Test Tournament 2024",
+            "description": "Tournament created specifically for testing auction functionality",
+            "real_life_tournament": "IPL 2024",
+            "max_participants": 8,
+            "budget": 1000000,
+            "squad_composition": {
+                "batsmen": 4,
+                "bowlers": 4,
+                "all_rounders": 2,
+                "wicket_keepers": 1
+            },
+            "auction_duration": 2.0
+        }
+        
+        success, tournament_response = self.run_test(
+            "Create Tournament for Auction Testing",
+            "POST",
+            "tournaments",
+            200,
+            data=tournament_data
+        )
+        
+        if not success or not tournament_response:
+            print("❌ Failed to create tournament. Cannot test auction creation.")
+            return False
+        
+        tournament_id = tournament_response.get('id')
+        print(f"✅ Tournament created with ID: {tournament_id}")
+        
+        # Step 2: Get available players for auction
+        print("\n📋 STEP 2: Getting Available Players...")
+        success, players = self.run_test(
+            "Get Players for Auction",
+            "GET",
+            "players",
+            200
+        )
+        
+        if not success or not players or len(players) == 0:
+            print("❌ No players available for auction testing.")
+            return False
+        
+        # Select first few players for testing
+        test_players = players[:3]  # Use first 3 players
+        print(f"✅ Found {len(players)} players. Using {len(test_players)} for testing:")
+        for player in test_players:
+            print(f"   - {player.get('name', 'Unknown')} (ID: {player.get('id')}, Price: ${player.get('price', 0):,})")
+        
+        # Step 3: Test Auction Creation - PRIORITY TEST 1
+        print("\n🎯 PRIORITY TEST 1: Auction Creation API")
+        auction_data = {
+            "tournament_id": tournament_id,
+            "player_id": test_players[0]['id'],
+            "duration_minutes": 180
+        }
+        
+        success, auction_response = self.run_test(
+            "Create Auction with Valid Data",
+            "POST",
+            "auctions",
+            200,
+            data=auction_data
+        )
+        
+        auction_creation_working = success
+        created_auction_id = None
+        
+        if success and auction_response:
+            created_auction_id = auction_response.get('id')
+            player_id = auction_response.get('player_id')
+            current_bid = auction_response.get('current_bid')
+            is_active = auction_response.get('is_active')
+            end_time = auction_response.get('end_time')
+            
+            print(f"✅ Auction created successfully!")
+            print(f"   Auction ID: {created_auction_id}")
+            print(f"   Player ID: {player_id}")
+            print(f"   Starting Bid: ${current_bid:,}")
+            print(f"   Is Active: {is_active}")
+            print(f"   End Time: {end_time}")
+        else:
+            print("❌ Auction creation failed!")
+        
+        # Step 4: Test Authentication Required - PRIORITY TEST 2
+        print("\n🎯 PRIORITY TEST 2: Authentication Check")
+        
+        # Temporarily remove token
+        temp_token = self.token
+        self.token = None
+        
+        success, _ = self.run_test(
+            "Create Auction Without Authentication (Should Fail)",
+            "POST",
+            "auctions",
+            401,  # Expecting 401 Unauthorized
+            data=auction_data
+        )
+        
+        auth_check_working = success  # Success means it correctly rejected unauthenticated request
+        
+        # Restore token
+        self.token = temp_token
+        
+        if auth_check_working:
+            print("✅ Authentication properly required for auction creation")
+        else:
+            print("❌ Authentication check failed - unauthenticated requests should be rejected")
+        
+        # Step 5: Test Invalid Tournament ID - PRIORITY TEST 3
+        print("\n🎯 PRIORITY TEST 3: Tournament Validation")
+        
+        invalid_tournament_data = {
+            "tournament_id": "invalid-tournament-id-999",
+            "player_id": test_players[0]['id'],
+            "duration_minutes": 180
+        }
+        
+        success, _ = self.run_test(
+            "Create Auction with Invalid Tournament ID (Should Fail)",
+            "POST",
+            "auctions",
+            404,  # Expecting 404 Not Found
+            data=invalid_tournament_data
+        )
+        
+        tournament_validation_working = success
+        
+        if tournament_validation_working:
+            print("✅ Tournament validation working - invalid tournament ID rejected")
+        else:
+            print("❌ Tournament validation failed - should reject invalid tournament IDs")
+        
+        # Step 6: Test Invalid Player ID - PRIORITY TEST 4
+        print("\n🎯 PRIORITY TEST 4: Player Validation")
+        
+        invalid_player_data = {
+            "tournament_id": tournament_id,
+            "player_id": "invalid-player-id-999",
+            "duration_minutes": 180
+        }
+        
+        success, _ = self.run_test(
+            "Create Auction with Invalid Player ID (Should Fail)",
+            "POST",
+            "auctions",
+            404,  # Expecting 404 Not Found
+            data=invalid_player_data
+        )
+        
+        player_validation_working = success
+        
+        if player_validation_working:
+            print("✅ Player validation working - invalid player ID rejected")
+        else:
+            print("❌ Player validation failed - should reject invalid player IDs")
+        
+        # Step 7: Test Admin Authorization - PRIORITY TEST 5
+        print("\n🎯 PRIORITY TEST 5: Admin Authorization Check")
+        
+        # Create a second user (non-admin)
+        non_admin_user_data = {
+            "username": f"nonadmin_{datetime.now().strftime('%H%M%S')}",
+            "email": f"nonadmin_{datetime.now().strftime('%H%M%S')}@example.com",
+            "password": "TestPass123!"
+        }
+        
+        success, _ = self.run_test(
+            "Register Non-Admin User",
+            "POST",
+            "auth/register",
+            200,
+            data=non_admin_user_data
+        )
+        
+        if success:
+            # Login as non-admin user
+            login_data = {
+                "email": non_admin_user_data["email"],
+                "password": non_admin_user_data["password"]
+            }
+            
+            success, login_response = self.run_test(
+                "Login as Non-Admin User",
+                "POST",
+                "auth/login",
+                200,
+                data=login_data
+            )
+            
+            if success and login_response:
+                # Temporarily switch to non-admin token
+                admin_token = self.token
+                self.token = login_response.get('access_token')
+                
+                # Try to create auction as non-admin (should fail)
+                success, _ = self.run_test(
+                    "Create Auction as Non-Admin (Should Fail)",
+                    "POST",
+                    "auctions",
+                    403,  # Expecting 403 Forbidden
+                    data=auction_data
+                )
+                
+                admin_auth_working = success
+                
+                # Restore admin token
+                self.token = admin_token
+                
+                if admin_auth_working:
+                    print("✅ Admin authorization working - non-admin users cannot create auctions")
+                else:
+                    print("❌ Admin authorization failed - non-admin users should not be able to create auctions")
+            else:
+                print("❌ Could not login as non-admin user for authorization test")
+                admin_auth_working = False
+        else:
+            print("❌ Could not create non-admin user for authorization test")
+            admin_auth_working = False
+        
+        # Step 8: Test Auction Listing - PRIORITY TEST 6
+        print("\n🎯 PRIORITY TEST 6: Auction Listing")
+        
+        success, all_auctions = self.run_test(
+            "Get All Auctions (After Creation)",
+            "GET",
+            "auctions",
+            200
+        )
+        
+        auction_listing_working = False
+        if success and all_auctions:
+            print(f"✅ Found {len(all_auctions)} total auctions")
+            
+            # Check if our created auction is in the list
+            if created_auction_id:
+                found_auction = None
+                for auction in all_auctions:
+                    if auction.get('id') == created_auction_id:
+                        found_auction = auction
+                        break
+                
+                if found_auction:
+                    print(f"✅ Created auction found in listing")
+                    print(f"   Tournament ID: {found_auction.get('tournament_id')}")
+                    print(f"   Player ID: {found_auction.get('player_id')}")
+                    print(f"   Current Bid: ${found_auction.get('current_bid', 0):,}")
+                    auction_listing_working = True
+                else:
+                    print(f"❌ Created auction not found in listing")
+            else:
+                auction_listing_working = True  # At least the endpoint works
+        else:
+            print("❌ Auction listing failed")
+        
+        # Step 9: Test Individual Auction Retrieval - PRIORITY TEST 7
+        print("\n🎯 PRIORITY TEST 7: Individual Auction Retrieval")
+        
+        individual_auction_working = False
+        if created_auction_id:
+            success, auction_details = self.run_test(
+                f"Get Specific Auction ({created_auction_id})",
+                "GET",
+                f"auctions/{created_auction_id}",
+                200
+            )
+            
+            if success and auction_details:
+                print(f"✅ Individual auction retrieval working")
+                print(f"   Auction ID: {auction_details.get('id')}")
+                print(f"   Tournament ID: {auction_details.get('tournament_id')}")
+                print(f"   Player ID: {auction_details.get('player_id')}")
+                print(f"   Current Bid: ${auction_details.get('current_bid', 0):,}")
+                print(f"   Is Active: {auction_details.get('is_active')}")
+                print(f"   Start Time: {auction_details.get('start_time')}")
+                print(f"   End Time: {auction_details.get('end_time')}")
+                individual_auction_working = True
+            else:
+                print("❌ Individual auction retrieval failed")
+        else:
+            print("❌ No auction ID available for individual retrieval test")
+        
+        # Step 10: Test Auction Timer and Duration Settings
+        print("\n🎯 BONUS TEST: Auction Timer and Duration")
+        
+        if created_auction_id and auction_response:
+            start_time = auction_response.get('start_time')
+            end_time = auction_response.get('end_time')
+            is_active = auction_response.get('is_active')
+            
+            timer_working = False
+            if start_time and end_time and is_active:
+                print(f"✅ Auction timer properly configured")
+                print(f"   Start Time: {start_time}")
+                print(f"   End Time: {end_time}")
+                print(f"   Status: {'Active' if is_active else 'Inactive'}")
+                timer_working = True
+            else:
+                print(f"❌ Auction timer configuration incomplete")
+                print(f"   Start Time: {start_time}")
+                print(f"   End Time: {end_time}")
+                print(f"   Is Active: {is_active}")
+        
+        # FINAL SUMMARY
+        print("\n" + "=" * 60)
+        print("🎯 AUCTION CREATION TEST RESULTS SUMMARY")
+        print("=" * 60)
+        
+        test_results = [
+            ("Auction Creation API", auction_creation_working),
+            ("Authentication Check", auth_check_working),
+            ("Tournament Validation", tournament_validation_working),
+            ("Player Validation", player_validation_working),
+            ("Admin Authorization", admin_auth_working),
+            ("Auction Listing", auction_listing_working),
+            ("Individual Auction Retrieval", individual_auction_working)
+        ]
+        
+        passed_tests = 0
+        total_tests = len(test_results)
+        
+        for test_name, result in test_results:
+            status = "✅ PASS" if result else "❌ FAIL"
+            print(f"   {test_name}: {status}")
+            if result:
+                passed_tests += 1
+        
+        print(f"\n📊 OVERALL RESULT: {passed_tests}/{total_tests} critical tests passed")
+        
+        if passed_tests == total_tests:
+            print("🎉 ALL AUCTION CREATION TESTS PASSED!")
+            print("   The auction creation functionality is working correctly.")
+            return True
+        else:
+            failed_tests = total_tests - passed_tests
+            print(f"⚠️  {failed_tests} critical test(s) failed.")
+            print("   Auction creation functionality has issues that need to be addressed.")
+            return False
 
     def test_live_stats(self):
         """Test live statistics endpoint"""
