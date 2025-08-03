@@ -216,9 +216,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Tournament Creation Frontend Integration"
-    - "Tournament Creation API"
-  stuck_tasks: []
+    - "CricData API Integration - Player Population"
+    - "CricData API Integration - Error Handling"
+  stuck_tasks:
+    - "CricData API Integration - Player Population"
   test_all: false
   test_priority: "high_first"
 
@@ -229,3 +230,5 @@ agent_communication:
       message: "Backend API testing completed successfully. All core functionality working: 1) Health check ✅ 2) Player endpoints ✅ 3) Tournament CRUD operations ✅ 4) Authentication (register/login/profile) ✅ 5) Tournament creation with realistic data ✅ 6) Tournament join flow ✅ 7) Error handling ✅. Backend is fully functional at https://50234383-3ebe-4c2f-a36a-3cf8628b1fd8.preview.emergentagent.com/api. The issue is confirmed to be frontend not making API calls to backend - frontend needs to replace mock data with actual API integration."
     - agent: "main"
       message: "TOURNAMENT CREATION BUG FIXED! ✅ Successfully implemented complete frontend-to-backend integration. Frontend now uses tournamentsApi.create() with authentication system. Users can click 'Quick Auth' to authenticate, then create tournaments via modal form. Tournament creation persists to backend and displays properly. Verified with end-to-end testing - created 'Test Tournament 2024' successfully. The original user issue 'tournament creation doesn't work' is now resolved."
+    - agent: "testing"
+      message: "CRICDATA API INTEGRATION TESTING COMPLETED: ✅ Health Check - Backend running with cricket integration ✅ Individual Player Lookup - Successfully retrieves player data ✅ Live Cricket Data - Both live matches and scores endpoints working ✅ Player Database - 20 players available including famous cricketers ❌ CRITICAL: Player Population - All 30 players fail with 'str' object has no attribute 'value' error in cricket_service.py ❌ Minor: Error Handling - Invalid players return 200 instead of 404. The CricData API key is working (22/100 daily requests used), but data transformation needs fixing for population to work."
