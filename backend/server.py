@@ -734,6 +734,131 @@ async def get_live_stats():
         "websocket_connections": manager.get_online_users_count()
     }
 
+# Cricket data routes
+@api_router.post("/cricket/populate-players")
+async def populate_cricket_players():
+    """Populate database with real cricket players from API"""
+    try:
+        from cricket_service import cricket_service
+        
+        # Get list of famous players
+        player_names = await cricket_service.search_famous_cricket_players()
+        populated_players = []
+        failed_players = []
+        
+        for player_name in player_names:
+            try:
+                # Get player data from API
+                cricket_player = await cricket_service.get_player_by_name(player_name)
+                
+                if cricket_player:
+                    # Convert to our Player model format
+                    player_data = {
+                        "id": str(uuid.uuid4()),
+                        "name": cricket_player.name,
+                        "position": cricket_player.role.value if cricket_player.role else "Batsman",
+                        "team": cricket_player.country or "Unknown",
+                        "rating": min(max(int((cricket_player.base_price or 100000) / 25000), 1), 10),
+                        "image": None,  # Will be populated separately
+                        "stats": {
+                            "matches": sum([cs.batting.matches or 0 for cs in cricket_player.career_summaries if cs.batting]),
+                            "runs": sum([cs.batting.runs or 0 for cs in cricket_player.career_summaries if cs.batting]),
+                            "average": max([cs.batting.average or 0 for cs in cricket_player.career_summaries if cs.batting] + [0]),
+                            "strike_rate": max([cs.batting.strike_rate or 0 for cs in cricket_player.career_summaries if cs.batting] + [0]),
+                            "centuries": sum([cs.batting.centuries or 0 for cs in cricket_player.career_summaries if cs.batting]),
+                            "wickets": sum([cs.bowling.wickets or 0 for cs in cricket_player.career_summaries if cs.bowling]),
+                            "economy": min([cs.bowling.economy or 10 for cs in cricket_player.career_summaries if cs.bowling] + [10]),
+                            "base_price": cricket_player.base_price or 100000
+                        }
+                    }
+                    
+                    # Save to database
+                    await db.players.replace_one(
+                        {"name": player_data["name"]},
+                        player_data,
+                        upsert=True
+                    )
+                    
+                    populated_players.append(player_data["name"])
+                    logger.info(f"Populated player: {player_data['name']}")
+                    
+                else:
+                    failed_players.append(player_name)
+                    
+            except Exception as e:
+                logger.error(f"Failed to populate player {player_name}: {str(e)}")
+                failed_players.append(player_name)
+        
+        return {
+            "message": f"Successfully populated {len(populated_players)} players",
+            "populated_players": populated_players,
+            "failed_players": failed_players,
+            "total_attempted": len(player_names)
+        }
+        
+    except Exception as e:
+        logger.error(f"Failed to populate cricket players: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to populate players: {str(e)}")
+
+@api_router.get("/cricket/player/{player_name}")
+async def get_cricket_player_details(player_name: str):
+    """Get detailed cricket player information"""
+    try:
+        from cricket_service import cricket_service
+        
+        cricket_player = await cricket_service.get_player_by_name(player_name)
+        
+        if not cricket_player:
+            raise HTTPException(status_code=404, detail=f"Player '{player_name}' not found")
+        
+        return {
+            "success": True,
+            "data": cricket_player.dict(),
+            "message": f"Player data retrieved for {player_name}"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to get cricket player {player_name}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to get player data: {str(e)}")
+
+@api_router.get("/cricket/live-matches")
+async def get_cricket_live_matches():
+    """Get current live cricket matches"""
+    try:
+        from cricket_service import cricket_service
+        
+        matches = await cricket_service.get_live_matches()
+        
+        return {
+            "success": True,
+            "data": matches,
+            "message": f"Retrieved {len(matches)} live matches"
+        }
+        
+    except Exception as e:
+        logger.error(f"Failed to get live matches: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to get live matches: {str(e)}")
+
+@api_router.get("/cricket/scores")
+async def get_cricket_scores():
+    """Get cricket scores and match information"""
+    try:
+        from cricket_service import cricket_service
+        
+        scores = await cricket_service.get_cricket_scores()
+        
+        return {
+            "success": True,
+            "data": scores,
+            "message": "Cricket scores retrieved successfully"
+        }
+        
+    except Exception as e:
+        logger.error(f"Failed to get cricket scores: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to get cricket scores: {str(e)}")
+
 # Include the router in the main app
 app.include_router(api_router)
 
