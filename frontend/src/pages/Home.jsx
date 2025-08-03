@@ -185,7 +185,7 @@ const Home = () => {
             <p className="text-lg text-muted-foreground mb-8">
               Join the most advanced cricket auction platform with real-time features and social gameplay.
             </p>
-            <div className="flex justify-center">
+            <div className="flex flex-col sm:flex-row justify-center gap-4">
               <Button 
                 variant="hero" 
                 size="lg"
@@ -197,6 +197,15 @@ const Home = () => {
               >
                 <Trophy className="mr-2 h-5 w-5" />
                 Start Your Journey
+              </Button>
+              <Button
+                variant="outline"
+                size="lg"
+                className="touch-target"
+                onClick={() => navigate("/testing")}
+              >
+                <TestTube className="mr-2 h-5 w-5" />
+                Testing Guide
               </Button>
             </div>
           </div>
