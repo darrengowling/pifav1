@@ -47,13 +47,22 @@ const Home = () => {
               <p className="text-sm text-white/70 mb-6">🏏 Official Cricket Board Partners</p>
               
               {/* Cricket Board Logos Row */}
-              <div className="flex justify-center items-center gap-6 md:gap-8 mb-8 flex-wrap">
+              <div className="flex justify-center items-center gap-4 md:gap-6 mb-8 flex-wrap">
                 {/* England Cricket */}
                 <div className="bg-white/95 p-3 rounded-lg shadow-lg">
                   <img 
                     src="https://customer-assets.emergentagent.com/job_cricket-bidding/artifacts/nu56dv79_192-1928338_england-cricket-team-logo-png-transparent-png.png"
                     alt="England Cricket Board"
-                    className="h-16 md:h-20 w-auto"
+                    className="h-14 md:h-16 w-auto"
+                  />
+                </div>
+                
+                {/* Cricket Australia */}
+                <div className="bg-white/95 p-3 rounded-lg shadow-lg">
+                  <img 
+                    src="https://customer-assets.emergentagent.com/job_cricket-bidding/artifacts/mujxahby_OIP%20%281%29.webp"
+                    alt="Cricket Australia"
+                    className="h-14 md:h-16 w-auto"
                   />
                 </div>
                 
@@ -62,7 +71,16 @@ const Home = () => {
                   <img 
                     src="https://customer-assets.emergentagent.com/job_cricket-bidding/artifacts/ol2zuddd_OIP.webp"
                     alt="Board of Control for Cricket in India (BCCI)"
-                    className="h-16 md:h-20 w-auto"
+                    className="h-14 md:h-16 w-auto"
+                  />
+                </div>
+                
+                {/* West Indies Cricket Board */}
+                <div className="bg-white/95 p-3 rounded-lg shadow-lg">
+                  <img 
+                    src="https://customer-assets.emergentagent.com/job_cricket-bidding/artifacts/mt8vvzqy_west-indies-cricket-team-logo-png_seeklogo-261160.png"
+                    alt="West Indies Cricket Board"
+                    className="h-14 md:h-16 w-auto"
                   />
                 </div>
                 
@@ -71,7 +89,7 @@ const Home = () => {
                   <img 
                     src="https://customer-assets.emergentagent.com/job_cricket-bidding/artifacts/rm9dq9dk_OSK%20%281%29.jpeg"
                     alt="Bangladesh Cricket Board"
-                    className="h-16 md:h-20 w-auto"
+                    className="h-14 md:h-16 w-auto"
                   />
                 </div>
                 
@@ -80,7 +98,7 @@ const Home = () => {
                   <img 
                     src="https://customer-assets.emergentagent.com/job_cricket-bidding/artifacts/yjdfiz0o_OSK%20%282%29.jpeg"
                     alt="New Zealand Cricket"
-                    className="h-16 md:h-20 w-auto"
+                    className="h-14 md:h-16 w-auto"
                   />
                 </div>
                 
@@ -89,7 +107,7 @@ const Home = () => {
                   <img 
                     src="https://customer-assets.emergentagent.com/job_cricket-bidding/artifacts/tkq6ilp4_OSK%20%283%29.jpeg"
                     alt="Cricket South Africa"
-                    className="h-16 md:h-20 w-auto"
+                    className="h-14 md:h-16 w-auto"
                   />
                 </div>
                 
@@ -98,7 +116,7 @@ const Home = () => {
                   <img 
                     src="https://customer-assets.emergentagent.com/job_cricket-bidding/artifacts/9wzw2847_OSK%20%284%29.jpeg"
                     alt="Sri Lanka Cricket"
-                    className="h-16 md:h-20 w-auto"
+                    className="h-14 md:h-16 w-auto"
                   />
                 </div>
               </div>
