@@ -356,6 +356,10 @@ def main():
     # Authentication tests
     tester.test_authentication_endpoints()
     
+    # NEW: CricData API Integration tests
+    tester.test_cricket_integration()
+    tester.test_populated_players_in_database()
+    
     # Error handling tests
     tester.test_error_handling()
     
