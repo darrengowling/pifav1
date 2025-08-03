@@ -57,6 +57,15 @@ const Home = () => {
                   />
                 </div>
                 
+                {/* Board of Control for Cricket in India (BCCI) */}
+                <div className="bg-white/95 p-3 rounded-lg shadow-lg">
+                  <img 
+                    src="https://customer-assets.emergentagent.com/job_cricket-bidding/artifacts/ol2zuddd_OIP.webp"
+                    alt="Board of Control for Cricket in India (BCCI)"
+                    className="h-16 md:h-20 w-auto"
+                  />
+                </div>
+                
                 {/* Bangladesh Cricket */}
                 <div className="bg-white/95 p-3 rounded-lg shadow-lg">
                   <img 
