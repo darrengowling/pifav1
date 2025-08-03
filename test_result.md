@@ -173,7 +173,7 @@ backend:
 
   - task: "CricData API Integration - Error Handling"
     implemented: true
-    working: false
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 1
     priority: "medium"
@@ -182,6 +182,9 @@ backend:
         - working: false
           agent: "testing"
           comment: "Minor: Error handling for invalid player names needs improvement. /api/cricket/player/NonExistentPlayer123 returns 200 status with default player data instead of 404 error. Should return proper error response for non-existent players to match expected behavior."
+        - working: true
+          agent: "testing"
+          comment: "FIXED! ✅ Error handling now works correctly. Invalid player names like 'NonExistentPlayer123' now properly return 404 status with error message 'Player not found in cricket database' instead of 200 with default data. Fixed by improving cricket_service.get_player_by_name() to properly detect API error responses (rate limiting, invalid players) and return None, which triggers the 404 response in the endpoint."
 
   - task: "CricData API Integration - Player Database Integration"
     implemented: true
