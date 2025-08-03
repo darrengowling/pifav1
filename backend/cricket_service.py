@@ -103,14 +103,8 @@ class CricketService:
             
         except Exception as e:
             logger.error(f"Failed to transform player data: {str(e)}")
-            # Return a basic player model on transformation error
-            return CricketPlayer(
-                name=api_data.get("Player Name") or api_data.get("name", "Unknown"),
-                country=api_data.get("Country") or api_data.get("country"),
-                role=PlayerRole.BATSMAN,
-                career_summaries=[],
-                base_price=100000.0
-            )
+            # Don't return a default player - let the caller handle None
+            raise e
     
     def _safe_int(self, value: Any) -> Optional[int]:
         """Safely convert value to integer"""
