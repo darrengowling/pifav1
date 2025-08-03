@@ -789,7 +789,13 @@ def main():
     # Authentication tests
     tester.test_authentication_endpoints()
     
-    # NEW: CricData API Integration tests
+    # PRIORITY: Comprehensive Auction Creation Testing (User Request)
+    print("\n" + "🎯" * 20)
+    print("USER PRIORITY REQUEST: AUCTION CREATION TESTING")
+    print("🎯" * 20)
+    auction_tests_passed = tester.test_auction_creation_comprehensive()
+    
+    # CricData API Integration tests (existing)
     tester.test_cricket_integration()
     tester.test_populated_players_in_database()
     
@@ -799,6 +805,12 @@ def main():
     # Print final results
     print("\n" + "=" * 50)
     print(f"📊 Final Results: {tester.tests_passed}/{tester.tests_run} tests passed")
+    
+    # Special focus on auction creation results
+    if auction_tests_passed:
+        print("🎉 AUCTION CREATION: All critical tests passed!")
+    else:
+        print("⚠️  AUCTION CREATION: Some critical tests failed!")
     
     if tester.tests_passed == tester.tests_run:
         print("🎉 All tests passed! API is working correctly.")
