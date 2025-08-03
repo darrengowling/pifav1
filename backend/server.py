@@ -756,7 +756,7 @@ async def populate_cricket_players():
                     player_data = {
                         "id": str(uuid.uuid4()),
                         "name": cricket_player.name,
-                        "position": cricket_player.role.value if cricket_player.role else "Batsman",
+                        "position": cricket_player.role if isinstance(cricket_player.role, str) else (cricket_player.role.value if cricket_player.role else "Batsman"),
                         "team": cricket_player.country or "Unknown",
                         "rating": min(max(int((cricket_player.base_price or 100000) / 25000), 1), 10),
                         "image": None,  # Will be populated separately
