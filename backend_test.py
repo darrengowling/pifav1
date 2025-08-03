@@ -219,6 +219,101 @@ class SportXAPITester:
         
         return success
 
+    def test_cricket_integration(self):
+        """Test CricData API integration endpoints"""
+        print("\n🏏 Testing CricData API Integration...")
+        
+        # Test cricket player population
+        success, populate_response = self.run_test(
+            "Populate Cricket Players from API",
+            "POST",
+            "cricket/populate-players",
+            200
+        )
+        
+        if success and populate_response:
+            print(f"   Populated: {populate_response.get('populated_players', [])}")
+            print(f"   Failed: {populate_response.get('failed_players', [])}")
+            print(f"   Total attempted: {populate_response.get('total_attempted', 0)}")
+        
+        # Test individual player lookup with a famous player
+        success2, player_response = self.run_test(
+            "Get Virat Kohli Details from API",
+            "GET",
+            "cricket/player/Virat Kohli",
+            200
+        )
+        
+        if success2 and player_response:
+            player_data = player_response.get('data', {})
+            print(f"   Player: {player_data.get('name', 'Unknown')}")
+            print(f"   Country: {player_data.get('country', 'Unknown')}")
+            print(f"   Role: {player_data.get('role', 'Unknown')}")
+            print(f"   Base Price: ${player_data.get('base_price', 0):,.2f}")
+        
+        # Test live matches
+        success3, live_matches = self.run_test(
+            "Get Live Cricket Matches",
+            "GET",
+            "cricket/live-matches",
+            200
+        )
+        
+        if success3 and live_matches:
+            matches_data = live_matches.get('data', [])
+            print(f"   Found {len(matches_data)} live matches")
+        
+        # Test cricket scores
+        success4, scores_response = self.run_test(
+            "Get Cricket Scores",
+            "GET",
+            "cricket/scores",
+            200
+        )
+        
+        if success4 and scores_response:
+            scores_data = scores_response.get('data', {})
+            print(f"   Cricket scores retrieved successfully")
+        
+        # Test error handling with invalid player name
+        success5, _ = self.run_test(
+            "Invalid Player Name (NonExistentPlayer123)",
+            "GET",
+            "cricket/player/NonExistentPlayer123",
+            404
+        )
+        
+        return success and success2 and success3 and success4 and success5
+    
+    def test_populated_players_in_database(self):
+        """Test if populated cricket players are available in regular players endpoint"""
+        print("\n📊 Testing Populated Players in Database...")
+        
+        # Get all players to check if new ones were added
+        success, players = self.run_test(
+            "Get All Players (After Population)",
+            "GET",
+            "players",
+            200
+        )
+        
+        if success and players:
+            print(f"   Total players in database: {len(players)}")
+            
+            # Look for some famous cricket players
+            famous_players = ["Virat Kohli", "Rohit Sharma", "MS Dhoni", "Hardik Pandya"]
+            found_players = []
+            
+            for player in players:
+                if player.get('name') in famous_players:
+                    found_players.append(player.get('name'))
+                    print(f"   Found: {player.get('name')} - {player.get('position')} - Rating: {player.get('rating')}")
+            
+            print(f"   Famous players found: {len(found_players)}/{len(famous_players)}")
+            return len(found_players) > 0
+        
+        return False
+
     def test_error_handling(self):
         """Test error handling for invalid requests"""
         print("\n❌ Testing Error Handling...")
