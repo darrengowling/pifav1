@@ -186,8 +186,62 @@ const Tournaments = () => {
     alert("Joined tournament successfully!");
   };
 
-  const handleStartAuction = (tournamentId) => {
-    navigate(`/auctions`);
+  const handleStartAuction = async (tournamentId) => {
+    try {
+      const tournament = tournaments.find(t => t.id === tournamentId);
+      if (!tournament) {
+        alert("Tournament not found");
+        return;
+      }
+
+      if ((tournament.participants?.length || 0) < 2) {
+        alert("Need at least 2 players to start auction");
+        return;
+      }
+
+      // For demo purposes, let's get a random player to auction
+      const response = await fetch(`${BACKEND_URL}/api/players`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch players');
+      }
+      
+      const players = await response.json();
+      if (!players || players.length === 0) {
+        alert("No players available for auction");
+        return;
+      }
+
+      // Select a random player for the auction
+      const randomPlayer = players[Math.floor(Math.random() * players.length)];
+
+      // Create auction via API
+      const auctionResponse = await fetch(`${BACKEND_URL}/api/auctions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        },
+        body: JSON.stringify({
+          tournament_id: tournamentId,
+          player_id: randomPlayer.id,
+          duration_minutes: 180
+        })
+      });
+
+      if (!auctionResponse.ok) {
+        const errorText = await auctionResponse.text();
+        throw new Error(`Failed to create auction: ${errorText}`);
+      }
+
+      const auction = await auctionResponse.json();
+      
+      // Navigate to the auction room
+      navigate(`/auction/${auction.id}`);
+      
+    } catch (error) {
+      console.error('Error starting auction:', error);
+      alert(`Failed to start auction: ${error.message}`);
+    }
   };
 
   const copyInviteCode = (code) => {
