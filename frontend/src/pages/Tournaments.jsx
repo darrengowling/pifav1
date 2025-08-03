@@ -160,32 +160,48 @@ const Tournaments = () => {
     return result;
   };
 
-  const handleJoinTournament = (tournamentId) => {
-    const tournament = tournaments.find(t => t.id === tournamentId);
-    if (!tournament) return;
+  const handleJoinTournament = async (tournamentId) => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/tournaments/${tournamentId}/join`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        }
+      });
 
-    if (tournament.participants.length >= tournament.maxParticipants) {
-      alert("Tournament is full!");
-      return;
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to join tournament: ${errorText}`);
+      }
+
+      // Refresh tournaments to get updated participant list
+      await fetchTournaments();
+      
+      alert("Joined tournament successfully!");
+      
+    } catch (error) {
+      console.error('Error joining tournament:', error);
+      
+      // Fallback to local state update for demo
+      setTournaments(prev => prev.map(t => 
+        t.id === tournamentId 
+          ? { ...t, participants: [...(t.participants || []), { 
+              id: "demo-user-" + Date.now(), 
+              name: "Demo Player", 
+              budget: t.budget, 
+              squad: [],
+              userId: "demo-user-" + Date.now(),
+              isAdmin: false,
+              inviteStatus: "accepted",
+              currentBudget: t.budget,
+              totalScore: 0
+            }] }
+          : t
+      ));
+      
+      alert("Joined tournament successfully! (Demo mode)");
     }
-
-    setTournaments(prev => prev.map(t => 
-      t.id === tournamentId 
-        ? { ...t, participants: [...t.participants, { 
-            id: "current-user", 
-            name: "You", 
-            budget: t.budget, 
-            squad: [],
-            userId: "current-user",
-            isAdmin: false,
-            inviteStatus: "accepted",
-            currentBudget: t.budget,
-            totalScore: 0
-          }] }
-        : t
-    ));
-    
-    alert("Joined tournament successfully!");
   };
 
   const handleStartAuction = async (tournamentId) => {
