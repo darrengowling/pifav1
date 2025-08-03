@@ -20,6 +20,8 @@ const Tournaments = () => {
   const [error, setError] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || import.meta.env.REACT_APP_BACKEND_URL;
+
   // Check authentication status
   useEffect(() => {
     const token = localStorage.getItem('authToken');
