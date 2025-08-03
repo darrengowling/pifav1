@@ -42,6 +42,18 @@ const Home = () => {
       }}>
         <div className="container mx-auto px-4 py-8 md:py-20">
           <div className="text-center max-w-4xl mx-auto">
+            {/* England Cricket Logo */}
+            <div className="mb-8 flex justify-center">
+              <img 
+                src="https://customer-assets.emergentagent.com/job_cricket-bidding/artifacts/nu56dv79_192-1928338_england-cricket-team-logo-png-transparent-png.png"
+                alt="England Cricket Team Logo"
+                className="h-24 md:h-32 w-auto drop-shadow-2xl"
+                style={{
+                  filter: 'drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5))'
+                }}
+              />
+            </div>
+            
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
               <span className="gradient-hero bg-clip-text text-transparent">
                 Sport X Cricket
