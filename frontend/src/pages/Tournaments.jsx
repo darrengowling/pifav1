@@ -598,7 +598,9 @@ const Tournaments = () => {
                       )}
 
                       <div className="flex gap-2">
-                        {normalizedTournament.admin === "Current User" ? (
+                        {/* Show Start Auction button if user is admin (or for demo purposes, if user has joined) */}
+                        {(normalizedTournament.admin === "Current User" || 
+                          normalizedTournament.participants?.some(p => p.name === "You" || p.name === "Demo Player")) ? (
                           <Button 
                             className="flex-1" 
                             onClick={() => handleStartAuction(normalizedTournament.id)}
@@ -615,7 +617,7 @@ const Tournaments = () => {
                             onClick={() => handleJoinTournament(normalizedTournament.id)}
                             disabled={(normalizedTournament.participants?.length || 0) >= normalizedTournament.maxParticipants}
                           >
-                            {normalizedTournament.participants?.some(p => p.name === "You") ? "✓ Joined" : "Join Tournament"}
+                            {normalizedTournament.participants?.some(p => p.name === "You" || p.name === "Demo Player") ? "✓ Joined" : "Join Tournament"}
                           </Button>
                         )}
                       </div>
