@@ -44,9 +44,9 @@ const RealTimeStats = () => {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         {[1, 2, 3, 4].map((i) => (
           <Card key={i} className="p-4 text-center">
-            <div className="text-muted-foreground">
+            <div className="text-gray-700">
               <div className="text-2xl font-bold">--</div>
-              <div className="text-sm">Offline</div>
+              <div className="text-sm font-medium">Offline</div>
             </div>
           </Card>
         ))}
