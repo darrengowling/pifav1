@@ -189,6 +189,30 @@
   box-shadow: 0 12px 40px rgba(59, 130, 246, 0.2);
 }
 
+/* Input field fixes for readability */
+input, 
+textarea, 
+select {
+  background-color: white !important;
+  color: #000000 !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #6b7280 !important;
+}
+
+/* Ensure form elements on gradient backgrounds are readable */
+.bg-gradient-to-r input,
+.bg-gradient-to-br input,
+.gradient-hero input,
+.gradient-cricket input,
+section[style*="background-image"] input {
+  background-color: white !important;
+  color: #000000 !important;
+  border: 1px solid #d1d5db !important;
+}
+
 /* Base styles */
 * {
   border-color: hsl(var(--border));
