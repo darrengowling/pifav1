@@ -277,10 +277,10 @@
   }
 }
 
-@layer base {
-  * {
-    border-color: hsl(var(--border));
-  }
+/* Base styles */
+* {
+  border-color: hsl(var(--border));
+}
 
   body {
     @apply bg-background text-foreground font-medium;
