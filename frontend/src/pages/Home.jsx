@@ -35,7 +35,7 @@ const Home = () => {
     <div className="min-h-screen pb-20 md:pt-20">
       {/* Hero Section with Cricket Action Background */}
       <section className="relative overflow-hidden min-h-screen flex items-center md:min-h-0" style={{
-        backgroundImage: 'linear-gradient(rgba(29, 185, 84, 0.8), rgba(255, 107, 53, 0.7)), url("https://customer-assets.emergentagent.com/job_cricket-bidding/artifacts/sjmiu7t3_pic%2011.jpg")',
+        backgroundImage: 'linear-gradient(rgba(59, 130, 246, 0.8), rgba(99, 102, 241, 0.7)), url("https://customer-assets.emergentagent.com/job_cricket-bidding/artifacts/sjmiu7t3_pic%2011.jpg")',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'
