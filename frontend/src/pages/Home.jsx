@@ -47,11 +47,14 @@ const Home = () => {
                 Sport X Cricket
               </span>
             </h1>
-            <p className="text-xl md:text-2xl text-muted-foreground mb-4">
+            <p className="text-xl md:text-2xl text-white/90 mb-4">
               Play with friends. Bid for superstars. Build legendary teams.
             </p>
-            <div className="inline-block bg-success/20 text-success px-4 py-2 rounded-full text-sm font-medium mb-8">
-              🔴 Live Real-time Auctions • WebSocket Powered
+            <div className="inline-block bg-primary/30 text-white px-4 py-2 rounded-full text-sm font-medium mb-8 backdrop-blur-sm">
+              <div className="inline-flex items-center gap-2">
+                <div className="w-3 h-3 bg-white rounded-full live-indicator"></div>
+                🔴 Live Real-time Auctions • WebSocket Powered
+              </div>
             </div>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
