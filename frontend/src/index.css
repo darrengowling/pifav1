@@ -116,19 +116,19 @@
 
 /* Card enhancements */
 .cricket-card {
-  background: linear-gradient(135deg, rgba(29, 185, 84, 0.1) 0%, rgba(255, 107, 53, 0.1) 100%);
-  border: 1px solid rgba(29, 185, 84, 0.2);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(99, 102, 241, 0.1) 100%);
+  border: 1px solid rgba(59, 130, 246, 0.2);
   backdrop-filter: blur(10px);
 }
 
 .cricket-card:hover {
-  border-color: rgba(29, 185, 84, 0.4);
-  box-shadow: 0 8px 32px rgba(29, 185, 84, 0.15);
+  border-color: rgba(59, 130, 246, 0.4);
+  box-shadow: 0 8px 32px rgba(59, 130, 246, 0.15);
 }
 
 /* Live indicator */
 .live-indicator {
-  background: linear-gradient(135deg, #1DB954 0%, #34a853 100%);
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
   animation: pulse 2s infinite;
 }
 
