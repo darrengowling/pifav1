@@ -312,7 +312,15 @@ const Tournaments = () => {
                          tournament.admin.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          tournament.realLifeTournament.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesTab = selectedTab === "all" || tournament.status === selectedTab;
-    return matchesSearch && matchesTab;
+    
+    // Only show tournaments where user is involved (admin or participant)
+    // For testing purposes, hide all existing public tournaments unless user is involved
+    const userInvolved = tournament.participants?.some(p => 
+      p.username === localStorage.getItem('currentUser') || 
+      p.user_id === localStorage.getItem('currentUserId')
+    ) || tournament.admin === localStorage.getItem('currentUser');
+    
+    return matchesSearch && matchesTab && userInvolved;
   });
 
   return (
