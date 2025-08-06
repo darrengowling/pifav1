@@ -198,7 +198,7 @@ body {
   @apply bg-background text-foreground font-medium;
   background-image: 
     radial-gradient(at 20% 50%, hsl(var(--primary) / 0.1) 0px, transparent 50%),
-    radial-gradient(at 80% 20%, hsl(var(--secondary) / 0.1) 0px, transparent 50%);
+    radial-gradient(at 80% 20%, hsl(var(--primary) / 0.1) 0px, transparent 50%);
 }
 
 .touch-target {
