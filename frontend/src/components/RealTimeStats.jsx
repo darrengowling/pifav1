@@ -79,7 +79,7 @@ const RealTimeStats = () => {
               </Badge>
             )}
           </div>
-          <div className="text-sm text-muted-foreground">{item.label}</div>
+          <div className="text-sm text-gray-700 font-medium">{item.label}</div>
           
           {/* Connection quality indicator */}
           {item.label === 'WebSocket Connections' && (
