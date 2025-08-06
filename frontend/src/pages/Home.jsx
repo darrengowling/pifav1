@@ -56,7 +56,7 @@ const Home = () => {
                 🔴 Live Real-time Auctions • WebSocket Powered
               </div>
             </div>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex justify-center">
               <Button 
                 variant="hero" 
                 size="lg" 
@@ -68,17 +68,6 @@ const Home = () => {
               >
                 <Zap className="mr-2 h-5 w-5" />
                 Quick Test Tournament
-              </Button>
-              <Button 
-                variant="outline" 
-                size="lg" 
-                className="btn-cricket-secondary touch-target"
-                onClick={() => {
-                  navigate("/tournaments");
-                }}
-              >
-                <Trophy className="mr-2 h-5 w-5" />
-                Browse All Tournaments
               </Button>
             </div>
           </div>
