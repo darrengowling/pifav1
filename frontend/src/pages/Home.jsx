@@ -180,19 +180,78 @@ const Home = () => {
         </div>
       </section>
 
+      {/* Cricket Action Showcase */}
+      <section className="py-16 bg-gradient-to-r from-primary/5 to-secondary/5">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Experience Cricket Like Never Before</h2>
+            <p className="text-lg text-muted-foreground">
+              From dramatic wickets to powerful sixes - live every moment of cricket action
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* Cricket Action Image 1 */}
+            <div className="relative group">
+              <img 
+                src="https://customer-assets.emergentagent.com/job_cricket-bidding/artifacts/ddsuh3gd_pic%2012.jpg"
+                alt="Cricket Action - Overhead Stadium View"
+                className="cricket-image w-full h-64 object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent rounded-lg flex items-end">
+                <div className="p-6 text-white">
+                  <h3 className="text-xl font-bold mb-2">Stadium Atmosphere</h3>
+                  <p className="text-white/80">Experience the electric energy of cricket stadiums</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Cricket Action Image 2 */}
+            <div className="relative group">
+              <img 
+                src="https://customer-assets.emergentagent.com/job_cricket-bidding/artifacts/resnsflv_pic%2014.webp"
+                alt="Cricket Action - Dynamic Batting"
+                className="cricket-image w-full h-64 object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent rounded-lg flex items-end">
+                <div className="p-6 text-white">
+                  <h3 className="text-xl font-bold mb-2">Power & Precision</h3>
+                  <p className="text-white/80">Bid on players with explosive batting skills</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Cricket Action Image 3 */}
+            <div className="relative group">
+              <img 
+                src="https://customer-assets.emergentagent.com/job_cricket-bidding/artifacts/qnqk3mei_pic%2015.jpg"
+                alt="Cricket Action - Wicket Drama"
+                className="cricket-image w-full h-64 object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent rounded-lg flex items-end">
+                <div className="p-6 text-white">
+                  <h3 className="text-xl font-bold mb-2">Wicket Drama</h3>
+                  <p className="text-white/80">Every ball counts in the ultimate cricket experience</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Call to Action */}
-      <section className="py-16 bg-gradient-to-r from-primary/10 to-secondary/10">
+      <section className="py-16 gradient-cricket relative">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-2xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Build Your Squad?</h2>
-            <p className="text-lg text-muted-foreground mb-8">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">Ready to Build Your Squad?</h2>
+            <p className="text-lg text-white/80 mb-8">
               Join the most advanced cricket auction platform with real-time features and social gameplay.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
               <Button 
                 variant="hero" 
                 size="lg"
-                className="touch-target"
+                className="btn-cricket-primary touch-target"
                 onClick={() => {
                   alert("Go to Tournaments! 🏏");
                   navigate("/tournaments");
@@ -204,7 +263,7 @@ const Home = () => {
               <Button
                 variant="outline"
                 size="lg"
-                className="touch-target"
+                className="btn-cricket-secondary touch-target"
                 onClick={() => navigate("/testing")}
               >
                 <TestTube className="mr-2 h-5 w-5" />
