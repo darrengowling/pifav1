@@ -60,7 +60,7 @@ const Home = () => {
               <Button 
                 variant="hero" 
                 size="lg" 
-                className="touch-target"
+                className="btn-cricket-primary touch-target"
                 onClick={() => {
                   alert("Creating test tournament! 🏏");
                   navigate("/tournaments?quick=test");
@@ -72,7 +72,7 @@ const Home = () => {
               <Button 
                 variant="outline" 
                 size="lg" 
-                className="touch-target bg-background/10 text-white border-white/20 hover:bg-white/10"
+                className="btn-cricket-secondary touch-target"
                 onClick={() => {
                   navigate("/tournaments");
                 }}
