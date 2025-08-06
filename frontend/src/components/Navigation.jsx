@@ -44,7 +44,7 @@ const Navigation = () => {
             <div className="w-8 h-8 gradient-hero rounded-lg flex items-center justify-center">
               <Trophy className="h-5 w-5 text-white" />
             </div>
-            <span className="text-xl font-bold gradient-hero bg-clip-text text-transparent">
+            <span className="text-xl font-bold text-foreground">
               Sport X
             </span>
           </div>
