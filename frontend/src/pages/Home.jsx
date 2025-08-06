@@ -99,9 +99,9 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Features Section - Cricket Equipment Background */}
       <section className="py-16 relative" style={{
-        backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.6)), url("https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80")',
+        backgroundImage: 'linear-gradient(rgba(255, 107, 53, 0.8), rgba(29, 185, 84, 0.6)), url("https://customer-assets.emergentagent.com/job_cricket-bidding/artifacts/9g71puh1_pic%2013.jpg")',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'
