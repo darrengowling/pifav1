@@ -74,44 +74,44 @@
   }
 }
 
-/* Cricket-themed gradient backgrounds */
+/* Modern gradient backgrounds */
 .gradient-hero {
-  background: linear-gradient(135deg, #1DB954 0%, #FF6B35 100%);
+  background: linear-gradient(135deg, #3B82F6 0%, #6366F1 100%);
 }
 
 .gradient-cricket {
-  background: linear-gradient(135deg, #1DB954 0%, #2E7D3E 50%, #FF6B35 100%);
+  background: linear-gradient(135deg, #3B82F6 0%, #6366F1 50%, #8B5CF6 100%);
 }
 
 .gradient-pitch {
-  background: linear-gradient(135deg, #2E7D3E 0%, #1DB954 100%);
+  background: linear-gradient(135deg, #6366F1 0%, #3B82F6 100%);
 }
 
-/* Button variants with cricket colors */
+/* Button variants with modern colors */
 .btn-cricket-primary {
-  background: linear-gradient(135deg, #1DB954 0%, #2E7D3E 100%);
+  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
   color: white;
   border: none;
   transition: all 0.3s ease;
 }
 
 .btn-cricket-primary:hover {
-  background: linear-gradient(135deg, #1ed760 0%, #34a853 100%);
+  background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(29, 185, 84, 0.3);
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
 }
 
 .btn-cricket-secondary {
-  background: linear-gradient(135deg, #FF6B35 0%, #FF8C00 100%);
+  background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
   color: white;
   border: none;
   transition: all 0.3s ease;
 }
 
 .btn-cricket-secondary:hover {
-  background: linear-gradient(135deg, #ff7849 0%, #ffa500 100%);
+  background: linear-gradient(135deg, #5B21B6 0%, #7C3AED 100%);
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(255, 107, 53, 0.3);
+  box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
 }
 
 /* Card enhancements */
