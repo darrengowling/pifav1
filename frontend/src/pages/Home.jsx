@@ -33,9 +33,9 @@ const Home = () => {
 
   return (
     <div className="min-h-screen pb-20 md:pt-20">
-      {/* Hero Section */}
+      {/* Hero Section with Cricket Action Background */}
       <section className="relative overflow-hidden min-h-screen flex items-center md:min-h-0" style={{
-        backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.5)), url("https://images.unsplash.com/photo-1531415074968-036ba1b575da?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80")',
+        backgroundImage: 'linear-gradient(rgba(29, 185, 84, 0.8), rgba(255, 107, 53, 0.7)), url("https://customer-assets.emergentagent.com/job_cricket-bidding/artifacts/sjmiu7t3_pic%2011.jpg")',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'
