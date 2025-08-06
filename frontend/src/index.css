@@ -189,6 +189,28 @@
   box-shadow: 0 12px 40px rgba(59, 130, 246, 0.2);
 }
 
+/* Stats card visibility fixes */
+.text-success {
+  color: #059669 !important;
+}
+
+.text-warning {
+  color: #D97706 !important;
+}
+
+.text-primary {
+  color: #2563EB !important;
+}
+
+.text-secondary {
+  color: #7C3AED !important;
+}
+
+/* Ensure stats cards have proper contrast */
+.gradient-auction .text-muted-foreground {
+  color: #4B5563 !important;
+}
+
 /* Input field fixes for readability */
 input, 
 textarea, 
