@@ -108,27 +108,27 @@ const Home = () => {
       }}>
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Play. Connect. Compete.</h2>
-            <p className="text-lg text-muted-foreground">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">Play. Connect. Compete.</h2>
+            <p className="text-lg text-white/80">
               Connect with friends, compete in live auctions, and celebrate cricket together.
             </p>
           </div>
           
           <div className="grid grid-cols-1 gap-6 max-w-sm mx-auto md:grid-cols-3 md:gap-8 md:max-w-4xl">
-            <div className="text-center p-8 rounded-lg border border-border bg-card/80 backdrop-blur-sm">
-              <div className="text-warning text-3xl mb-4">⚡</div>
-              <h3 className="font-semibold mb-2 text-lg">Real-time Bidding</h3>
-              <p className="text-muted-foreground">WebSocket-powered live auctions with instant updates</p>
+            <div className="cricket-card text-center p-8 rounded-lg">
+              <div className="text-secondary text-3xl mb-4">⚡</div>
+              <h3 className="font-semibold mb-2 text-lg text-white">Real-time Bidding</h3>
+              <p className="text-white/70">WebSocket-powered live auctions with instant updates</p>
             </div>
-            <div className="text-center p-8 rounded-lg border border-border bg-card/80 backdrop-blur-sm">
-              <div className="text-success text-3xl mb-4">🏆</div>
-              <h3 className="font-semibold mb-2 text-lg">Achievement System</h3>
-              <p className="text-muted-foreground">Unlock achievements and earn points for your cricket expertise</p>
+            <div className="cricket-card text-center p-8 rounded-lg">
+              <div className="text-primary text-3xl mb-4">🏆</div>
+              <h3 className="font-semibold mb-2 text-lg text-white">Achievement System</h3>
+              <p className="text-white/70">Unlock achievements and earn points for your cricket expertise</p>
             </div>
-            <div className="text-center p-8 rounded-lg border border-border bg-card/80 backdrop-blur-sm">
-              <div className="text-primary text-3xl mb-4">👥</div>
-              <h3 className="font-semibold mb-2 text-lg">Social Features</h3>
-              <p className="text-muted-foreground">Invite friends, chat during auctions, and build communities</p>
+            <div className="cricket-card text-center p-8 rounded-lg">
+              <div className="text-secondary text-3xl mb-4">👥</div>
+              <h3 className="font-semibold mb-2 text-lg text-white">Social Features</h3>
+              <p className="text-white/70">Invite friends, chat during auctions, and build communities</p>
             </div>
           </div>
         </div>
