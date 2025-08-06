@@ -283,26 +283,36 @@ const Tournaments = () => {
     setInviteCode("");
   };
 
+  // Filter tournaments to only show user-involved ones for cleaner testing
+  const userTournaments = tournaments.filter(tournament => {
+    const userInvolved = tournament.participants?.some(p => 
+      p.username === localStorage.getItem('currentUser') || 
+      p.user_id === localStorage.getItem('currentUserId')
+    ) || tournament.admin === localStorage.getItem('currentUser');
+    return userInvolved;
+  });
+
+  // Tab options with filtered counts
   const tabs = [
     { 
       value: "all", 
       label: "All", 
-      count: tournaments.length 
+      count: userTournaments.length 
     },
     { 
       value: "setup", 
       label: "Setup", 
-      count: tournaments.filter(t => t.status === "setup").length 
+      count: userTournaments.filter(t => t.status === "setup").length 
     },
     { 
       value: "active", 
       label: "Active", 
-      count: tournaments.filter(t => t.status === "active").length 
+      count: userTournaments.filter(t => t.status === "active").length 
     },
     { 
       value: "auction_scheduled", 
       label: "Auction Soon", 
-      count: tournaments.filter(t => t.status === "auction_scheduled").length 
+      count: userTournaments.filter(t => t.status === "auction_scheduled").length 
     },
   ];
 
