@@ -101,7 +101,7 @@ const Home = () => {
 
       {/* Features Section - Cricket Equipment Background */}
       <section className="py-16 relative" style={{
-        backgroundImage: 'linear-gradient(rgba(99, 102, 241, 0.8), rgba(139, 92, 246, 0.6)), url("https://customer-assets.emergentagent.com/job_cricket-bidding/artifacts/9g71puh1_pic%2013.jpg")',
+        backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.4)), url("https://customer-assets.emergentagent.com/job_cricket-bidding/artifacts/9g71puh1_pic%2013.jpg")',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'
