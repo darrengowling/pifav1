@@ -84,8 +84,8 @@ const RealTimeStats = () => {
           {/* Connection quality indicator */}
           {item.label === 'WebSocket Connections' && (
             <div className="mt-2">
-              <div className={`text-xs ${item.value > 0 ? 'text-success' : 'text-muted-foreground'}`}>
-                {item.value > 0 ? '🟢 Connected' : '⚪ Offline'}
+              <div className={`text-xs font-medium ${item.value > 0 ? 'text-success' : 'text-gray-600'}`}>
+                {item.value > 0 ? '🟢 Connected' : '🔴 Offline'}
               </div>
             </div>
           )}
