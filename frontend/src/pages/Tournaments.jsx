@@ -412,7 +412,7 @@ const Tournaments = () => {
           <Card>
             <CardContent className="p-4">
               <div className="text-2xl font-bold text-primary">
-                {tournaments.filter(t => t.status === "active").length}
+                {userTournaments.filter(t => t.status === "active").length}
               </div>
               <div className="text-sm text-muted-foreground">Active Tournaments</div>
             </CardContent>
@@ -420,7 +420,7 @@ const Tournaments = () => {
           <Card>
             <CardContent className="p-4">
               <div className="text-2xl font-bold text-warning">
-                {tournaments.filter(t => t.status === "auction_scheduled").length}
+                {userTournaments.filter(t => t.status === "auction_scheduled").length}
               </div>
               <div className="text-sm text-muted-foreground">Auctions Soon</div>
             </CardContent>
@@ -428,7 +428,7 @@ const Tournaments = () => {
           <Card>
             <CardContent className="p-4">
               <div className="text-2xl font-bold text-secondary">
-                {tournaments.reduce((acc, t) => acc + t.participants.length, 0)}
+                {userTournaments.reduce((acc, t) => acc + t.participants.length, 0)}
               </div>
               <div className="text-sm text-muted-foreground">Total Participants</div>
             </CardContent>
@@ -436,7 +436,7 @@ const Tournaments = () => {
           <Card>
             <CardContent className="p-4">
               <div className="text-2xl font-bold text-success">
-                {tournaments.reduce((acc, t) => acc + (t.budget * t.participants.length), 0).toLocaleString()}
+                {userTournaments.reduce((acc, t) => acc + (t.budget * t.participants.length), 0).toLocaleString()}
               </div>
               <div className="text-sm text-muted-foreground">Total Budget</div>
             </CardContent>
