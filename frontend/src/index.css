@@ -152,20 +152,20 @@
 .nav-cricket {
   background: rgba(18, 18, 18, 0.95);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(29, 185, 84, 0.2);
+  border-bottom: 1px solid rgba(59, 130, 246, 0.2);
 }
 
 /* Tournament card enhancements */
 .tournament-card {
-  background: linear-gradient(135deg, rgba(29, 185, 84, 0.05) 0%, rgba(255, 107, 53, 0.05) 100%);
-  border: 1px solid rgba(29, 185, 84, 0.15);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(99, 102, 241, 0.05) 100%);
+  border: 1px solid rgba(59, 130, 246, 0.15);
   transition: all 0.3s ease;
 }
 
 .tournament-card:hover {
-  border-color: rgba(29, 185, 84, 0.3);
+  border-color: rgba(59, 130, 246, 0.3);
   transform: translateY(-4px);
-  box-shadow: 0 12px 40px rgba(29, 185, 84, 0.1);
+  box-shadow: 0 12px 40px rgba(59, 130, 246, 0.1);
 }
 
 /* Auction room enhancements */
@@ -173,7 +173,7 @@
   background: linear-gradient(
     135deg,
     rgba(18, 18, 18, 0.95) 0%,
-    rgba(29, 185, 84, 0.1) 100%
+    rgba(59, 130, 246, 0.1) 100%
   );
 }
 
@@ -186,7 +186,7 @@
 
 .cricket-image:hover {
   transform: scale(1.02);
-  box-shadow: 0 12px 40px rgba(29, 185, 84, 0.2);
+  box-shadow: 0 12px 40px rgba(59, 130, 246, 0.2);
 }
 
 /* Base styles */
