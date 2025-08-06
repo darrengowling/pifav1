@@ -42,8 +42,8 @@ const Home = () => {
       }}>
         <div className="container mx-auto px-4 py-8 md:py-20">
           <div className="text-center max-w-4xl mx-auto">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              <span className="gradient-hero bg-clip-text text-transparent">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 text-white">
+              <span className="drop-shadow-lg" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.8)'}}>
                 Sport X Cricket
               </span>
             </h1>
